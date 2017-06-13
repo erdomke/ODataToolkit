@@ -1,12 +1,12 @@
-﻿namespace LinqToQuerystring.TreeNodes.DataTypes
+﻿namespace LinqToQuerystring.Nodes.DataTypes
 {
   using System;
   using System.Linq;
   using System.Linq.Expressions;
   
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class NullNode : TreeNode
+  public class NullNode : ODataNode
   {
     public NullNode(Token payload) : base(payload) { }
 

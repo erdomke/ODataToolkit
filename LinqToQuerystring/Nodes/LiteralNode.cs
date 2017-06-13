@@ -1,12 +1,12 @@
-﻿namespace LinqToQuerystring.TreeNodes
+﻿namespace LinqToQuerystring.Nodes
 {
   using System;
   using System.Linq;
   using System.Linq.Expressions;
 
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class LiteralNode : TreeNode
+  public class LiteralNode : ODataNode
   {
     public LiteralNode(Token payload) : base(payload) { }
 

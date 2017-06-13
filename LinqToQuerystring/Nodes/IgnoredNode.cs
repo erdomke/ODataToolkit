@@ -1,12 +1,12 @@
-﻿namespace LinqToQuerystring.TreeNodes
+﻿namespace LinqToQuerystring.Nodes
 {
   using System;
   using System.Linq;
   using System.Linq.Expressions;
 
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class IgnoredNode : TreeNode
+  public class IgnoredNode : ODataNode
   {
     public IgnoredNode(Token payload) : base(payload)
     {

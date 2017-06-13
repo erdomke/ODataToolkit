@@ -1,4 +1,4 @@
-﻿namespace LinqToQuerystring.TreeNodes
+﻿namespace LinqToQuerystring.Nodes
 {
   using System;
   using System.Collections.Generic;
@@ -6,9 +6,9 @@
   using System.Linq.Expressions;
   using System.Reflection;
 
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class SelectNode : SingleChildNode
+  public class SelectNode : UnaryNode
   {
     public SelectNode(Token payload) : base(payload) { }
 
@@ -34,17 +34,11 @@
       return Expression.Call(typeof(Queryable), "Select", new[] { options.Query.ElementType, typeof(Dictionary<string, object>) }, options.Query.Expression, lambda);
     }
 
-    public override int CompareTo(TreeNode other)
+    public override int CompareTo(ODataNode other)
     {
       if (other is SelectNode)
       {
         return 0;
-      }
-
-      // Select clause should always be last apart from inlinecount
-      if (other is InlineCountNode)
-      {
-        return -1;
       }
 
       return 1;

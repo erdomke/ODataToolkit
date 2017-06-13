@@ -1,16 +1,16 @@
-﻿using LinqToQuerystring.TreeNodes.Base;
+﻿using LinqToQuerystring.Nodes.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using LinqToQuerystring.TreeNodes;
+using LinqToQuerystring.Nodes;
 
 namespace LinqToQuerystring
 {
-  public class ODataQuery : IList<TreeNode>
+  public class ODataQuery : IList<ODataNode>
   {
-    private List<TreeNode> _nodes = new List<TreeNode>();
+    private List<ODataNode> _nodes = new List<ODataNode>();
 
     public int? Skip
     {
@@ -63,13 +63,13 @@ namespace LinqToQuerystring
       node.Children.Add(new LiteralNode(new Token(TokenType.Integer, value.ToString())));
     }
 
-    public TreeNode this[int index]
+    public ODataNode this[int index]
     {
       get { return _nodes[index]; }
       set { _nodes[index] = value; }
     }
 
-    public TreeNode this[string name]
+    public ODataNode this[string name]
     {
       get
       {
@@ -82,7 +82,7 @@ namespace LinqToQuerystring
 
     public bool IsReadOnly { get { return false; } }
 
-    public void Add(TreeNode item)
+    public void Add(ODataNode item)
     {
       _nodes.Add(item);
     }
@@ -92,27 +92,27 @@ namespace LinqToQuerystring
       _nodes.Clear();
     }
 
-    public bool Contains(TreeNode item)
+    public bool Contains(ODataNode item)
     {
       return _nodes.Contains(item);
     }
 
-    public void CopyTo(TreeNode[] array, int arrayIndex)
+    public void CopyTo(ODataNode[] array, int arrayIndex)
     {
       _nodes.CopyTo(array, arrayIndex);
     }
 
-    public IEnumerator<TreeNode> GetEnumerator()
+    public IEnumerator<ODataNode> GetEnumerator()
     {
       return _nodes.GetEnumerator();
     }
 
-    public int IndexOf(TreeNode item)
+    public int IndexOf(ODataNode item)
     {
       return _nodes.IndexOf(item);
     }
 
-    public void Insert(int index, TreeNode item)
+    public void Insert(int index, ODataNode item)
     {
       _nodes.Insert(index, item);
     }
@@ -131,7 +131,7 @@ namespace LinqToQuerystring
       return i < origCount;
     }
 
-    public bool Remove(TreeNode item)
+    public bool Remove(ODataNode item)
     {
       return _nodes.Remove(item);
     }

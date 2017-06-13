@@ -1,4 +1,4 @@
-﻿using LinqToQuerystring.TreeNodes;
+﻿using LinqToQuerystring.Nodes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace LinqToQuerystring.MsTests
     {
       var tree = OData.Parse(@"?$filter=day(Date) eq 2");
       var initialNode = tree.QueryOption["$filter"].Children.First().Children.First();
-      Assert.AreEqual(true, initialNode is FunctionNode);
+      Assert.AreEqual(true, initialNode is CallNode);
       Assert.AreEqual(2, initialNode.Children.Count);
     }
 
@@ -36,12 +36,12 @@ namespace LinqToQuerystring.MsTests
     {
       var tree = OData.Parse(@"?$filter=day(Date, 2) eq 2");
       var initialNode = tree.QueryOption["$filter"].Children.First().Children.First();
-      Assert.AreEqual(true, initialNode is FunctionNode);
+      Assert.AreEqual(true, initialNode is CallNode);
       Assert.AreEqual(3, initialNode.Children.Count);
 
       tree = OData.Parse(@"?$filter=day(Date, 2, 'string') eq 2");
       initialNode = tree.QueryOption["$filter"].Children.First().Children.First();
-      Assert.AreEqual(true, initialNode is FunctionNode);
+      Assert.AreEqual(true, initialNode is CallNode);
       Assert.AreEqual(4, initialNode.Children.Count);
     }
 
@@ -69,6 +69,16 @@ namespace LinqToQuerystring.MsTests
       Assert.IsInstanceOfType(orderBy.Children[0], typeof(AscNode));
       Assert.AreEqual(2, orderBy.Children[0].Children[0].Children.Count);
       Assert.IsInstanceOfType(orderBy.Children[1], typeof(AscNode));
+    }
+
+    [TestMethod]
+    public void Parse_Url()
+    {
+      var tree = OData.Parse("http://host/service/ProductsByColor(color=@color)?@color='red'");
+      Assert.AreEqual(2, tree.PathSegments.Count);
+      Assert.AreEqual("service", tree.PathSegments[0].Text);
+      Assert.AreEqual("ProductsByColor", tree.PathSegments[1].Text);
+      Assert.AreEqual(TokenType.Call, tree.PathSegments[1].Type);
     }
   }
 }

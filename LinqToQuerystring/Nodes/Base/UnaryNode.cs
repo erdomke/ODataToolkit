@@ -1,13 +1,13 @@
-﻿namespace LinqToQuerystring.TreeNodes.Base
+﻿namespace LinqToQuerystring.Nodes.Base
 {
   using System;
   using System.Linq;
 
-  public abstract class SingleChildNode : TreeNode
+  public abstract class UnaryNode : ODataNode
   {
-    protected SingleChildNode(Token payload) : base(payload) { }
+    protected UnaryNode(Token payload) : base(payload) { }
 
-    public TreeNode ChildNode
+    public ODataNode ChildNode
     {
       get
       {

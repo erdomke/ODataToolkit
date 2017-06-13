@@ -163,7 +163,7 @@ namespace LinqToQuerystring
           case State.ParamEq:
             if (i == _idx && _value[i] == '=')
             {
-              _current = new Token(TokenType.Equals, _value.Substring(_idx, 1));
+              _current = new Token(TokenType.QueryAssign, _value.Substring(_idx, 1));
               _state = State.ParamValue;
               _idx = i + 1;
               return true;
@@ -221,7 +221,7 @@ namespace LinqToQuerystring
           case State.QueryEq:
             if (i == _idx && _value[i] == '=')
             {
-              _current = new Token(TokenType.Equals, _value.Substring(_idx, 1));
+              _current = new Token(TokenType.QueryAssign, _value.Substring(_idx, 1));
               _state = State.QueryValue;
               _idx = i + 1;
               return true;
@@ -370,7 +370,7 @@ namespace LinqToQuerystring
         return null;
       }
       result.Text = "@" + result.Text;
-      result.Type = TokenType.Alias;
+      result.Type = TokenType.Parameter;
       return result;
     }
 
@@ -397,29 +397,61 @@ namespace LinqToQuerystring
       if (i == _idx)
         return null;
 
+      var type = TokenType.PathSeparator;
       switch (_value.Substring(_idx, i - _idx))
       {
         case "and":
+          type = TokenType.And;
+          break;
         case "or":
+          type = TokenType.Or;
+          break;
         case "eq":
+          type = TokenType.Equal;
+          break;
         case "ne":
+          type = TokenType.NotEqual;
+          break;
         case "lt":
+          type = TokenType.LessThan;
+          break;
         case "le":
+          type = TokenType.LessThanOrEqual;
+          break;
         case "gt":
+          type = TokenType.GreaterThan;
+          break;
         case "ge":
+          type = TokenType.GreaterThanOrEqual;
+          break;
         case "has":
+          type = TokenType.Has;
+          break;
         case "add":
+          type = TokenType.Add;
+          break;
         case "sub":
+          type = TokenType.Subtract;
+          break;
         case "mul":
+          type = TokenType.Multiply;
+          break;
         case "div":
+          type = TokenType.Divide;
+          break;
         case "mod":
+          type = TokenType.Modulo;
+          break;
         case "not":
-          var result = new Token(TokenType.Operator, _value.Substring(_idx, i - _idx));
-          _idx = i;
-          return result;
+          type = TokenType.Not;
+          break;
+        default:
+          return null;
       }
 
-      return null;
+      var result = new Token(type, _value.Substring(_idx, i - _idx));
+      _idx = i;
+      return result;
     }
 
     public Token TryConsumeLiteral()

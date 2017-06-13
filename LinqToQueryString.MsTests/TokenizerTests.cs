@@ -37,7 +37,7 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/ProductsByCategoryId(categoryId=2)"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.OpenParen, TokenType.Identifier, TokenType.Equals, TokenType.Integer, TokenType.CloseParen);
+        , TokenType.OpenParen, TokenType.Identifier, TokenType.QueryAssign, TokenType.Integer, TokenType.CloseParen);
     }
 
     [TestMethod]
@@ -48,8 +48,8 @@ namespace LinqToQuerystring.MsTests
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
         , TokenType.OpenParen, TokenType.Integer, TokenType.CloseParen
         , TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.OpenParen, TokenType.Identifier, TokenType.Equals, TokenType.Integer, TokenType.Comma
-        , TokenType.Identifier, TokenType.Equals, TokenType.Integer, TokenType.CloseParen);
+        , TokenType.OpenParen, TokenType.Identifier, TokenType.QueryAssign, TokenType.Integer, TokenType.Comma
+        , TokenType.Identifier, TokenType.QueryAssign, TokenType.Integer, TokenType.CloseParen);
     }
 
     [TestMethod]
@@ -58,8 +58,8 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/ProductsByColor(color=@color)?@color='red'"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.OpenParen, TokenType.Identifier, TokenType.Equals, TokenType.Alias, TokenType.CloseParen
-        , TokenType.Question, TokenType.Alias, TokenType.Equals, TokenType.String);
+        , TokenType.OpenParen, TokenType.Identifier, TokenType.QueryAssign, TokenType.Parameter, TokenType.CloseParen
+        , TokenType.Question, TokenType.Parameter, TokenType.QueryAssign, TokenType.String);
     }
 
     [TestMethod]
@@ -97,9 +97,9 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/Categories(ID=1)/Products(ID=1)"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.OpenParen, TokenType.Identifier, TokenType.Equals, TokenType.Integer, TokenType.CloseParen
+        , TokenType.OpenParen, TokenType.Identifier, TokenType.QueryAssign, TokenType.Integer, TokenType.CloseParen
         , TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.OpenParen, TokenType.Identifier, TokenType.Equals, TokenType.Integer, TokenType.CloseParen);
+        , TokenType.OpenParen, TokenType.Identifier, TokenType.QueryAssign, TokenType.Integer, TokenType.CloseParen);
     }
 
     [TestMethod]
@@ -156,9 +156,9 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/Categories?$filter=Products/$count gt 0"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
         , TokenType.Navigation, TokenType.Identifier
-        , TokenType.Whitespace, TokenType.Operator, TokenType.Whitespace, TokenType.Integer);
+        , TokenType.Whitespace, TokenType.GreaterThan, TokenType.Whitespace, TokenType.Integer);
     }
 
     [TestMethod]
@@ -168,52 +168,62 @@ namespace LinqToQuerystring.MsTests
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
         , TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
         , TokenType.OpenParen, TokenType.Identifier, TokenType.Comma, TokenType.String, TokenType.CloseParen);
     }
 
     [TestMethod]
     public void Tokens_FilterQuery_BoolLogic()
     {
-      var urls = new string[]
-      {
-        "http://host/service/Products?$filter=Name eq 'Milk' and Price lt 2.55",
-        "http://host/service/Products?$filter=Name eq 'Milk' or Price lt 2.55",
-      };
-
-      foreach (var url in urls)
-      {
-        VerifySequence(url
+      VerifySequence("http://host/service/Products?$filter=Name eq 'Milk' and Price lt 2.55"
           , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
           , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-          , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
-          , TokenType.Whitespace, TokenType.Operator, TokenType.Whitespace, TokenType.String
-          , TokenType.Whitespace, TokenType.Operator, TokenType.Whitespace, TokenType.Identifier
-          , TokenType.Whitespace, TokenType.Operator, TokenType.Whitespace, TokenType.Double);
-      }
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.Equal, TokenType.Whitespace, TokenType.String
+          , TokenType.Whitespace, TokenType.And, TokenType.Whitespace, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.LessThan, TokenType.Whitespace, TokenType.Double);
+      VerifySequence("http://host/service/Products?$filter=Name eq 'Milk' or Price lt 2.55"
+          , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
+          , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.Equal, TokenType.Whitespace, TokenType.String
+          , TokenType.Whitespace, TokenType.Or, TokenType.Whitespace, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.LessThan, TokenType.Whitespace, TokenType.Double);
     }
 
     [TestMethod]
     public void Tokens_FilterQuery_Operators()
     {
-      var urls = new string[]
-      {
-        "http://host/service/Products?$filter=Name eq 'Milk'",
-        "http://host/service/Products?$filter=Name ne 'Milk'",
-        "http://host/service/Products?$filter=Name gt 'Milk'",
-        "http://host/service/Products?$filter=Name ge 'Milk'",
-        "http://host/service/Products?$filter=Name lt 'Milk'",
-        "http://host/service/Products?$filter=Name le 'Milk'",
-      };
-
-      foreach (var url in urls)
-      {
-        VerifySequence(url
+      VerifySequence("http://host/service/Products?$filter=Name eq 'Milk'"
           , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
           , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-          , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
-          , TokenType.Whitespace, TokenType.Operator, TokenType.Whitespace, TokenType.String);
-      }
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.Equal, TokenType.Whitespace, TokenType.String);
+      VerifySequence("http://host/service/Products?$filter=Name ne 'Milk'"
+          , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
+          , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.NotEqual, TokenType.Whitespace, TokenType.String);
+      VerifySequence("http://host/service/Products?$filter=Name gt 'Milk'"
+          , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
+          , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.GreaterThan, TokenType.Whitespace, TokenType.String);
+      VerifySequence("http://host/service/Products?$filter=Name ge 'Milk'"
+          , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
+          , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.GreaterThanOrEqual, TokenType.Whitespace, TokenType.String);
+      VerifySequence("http://host/service/Products?$filter=Name lt 'Milk'"
+          , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
+          , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.LessThan, TokenType.Whitespace, TokenType.String);
+      VerifySequence("http://host/service/Products?$filter=Name le 'Milk'"
+          , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
+          , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
+          , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+          , TokenType.Whitespace, TokenType.LessThanOrEqual, TokenType.Whitespace, TokenType.String);
     }
 
 
@@ -260,7 +270,7 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/Categories?$orderby=Products/$count"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
         , TokenType.Navigation, TokenType.Identifier);
     }
 
@@ -270,7 +280,7 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/Orders?$expand=Customer/Model.VipCustomer"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
         , TokenType.Navigation, TokenType.Identifier, TokenType.Period, TokenType.Identifier);
     }
 
@@ -280,16 +290,16 @@ namespace LinqToQuerystring.MsTests
       VerifySequence("http://host/service/$all?$search=red"
         , TokenType.Scheme, TokenType.PathSeparator, TokenType.Authority
         , TokenType.PathSeparator, TokenType.Identifier, TokenType.PathSeparator, TokenType.Identifier
-        , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier);
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier);
     }
 
     [TestMethod]
     public void Tokens_Query()
     {
       VerifySequence("?$format=json&$filter=Name eq 'Apple'"
-        , TokenType.Question, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
-        , TokenType.Amperstand, TokenType.QueryName, TokenType.Equals, TokenType.Identifier
-        , TokenType.Whitespace , TokenType.Operator, TokenType.Whitespace, TokenType.String);
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+        , TokenType.Amperstand, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+        , TokenType.Whitespace , TokenType.Equal, TokenType.Whitespace, TokenType.String);
     }
   }
 }

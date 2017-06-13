@@ -1,8 +1,8 @@
-﻿namespace LinqToQuerystring.TreeNodes.Base
+﻿namespace LinqToQuerystring.Nodes.Base
 {
   using System;
 
-  public abstract class ExplicitOrderByBase : TreeNode
+  public abstract class ExplicitOrderByBase : ODataNode
   {
     protected ExplicitOrderByBase(Token payload) : base(payload)
     {

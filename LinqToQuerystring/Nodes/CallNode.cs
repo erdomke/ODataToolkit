@@ -1,15 +1,24 @@
-﻿namespace LinqToQuerystring.TreeNodes
+﻿namespace LinqToQuerystring.Nodes
 {
   using System;
   using System.Linq;
   using System.Linq.Expressions;
 
   using LinqToQuerystring.Exceptions;
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class FunctionNode : TreeNode
+  public class CallNode : ODataNode
   {
-    public FunctionNode(Token payload) : base(payload) { }
+    private FunctionArguments _args;
+
+    public FunctionArguments Arguments { get { return _args; } }
+    public override TokenType Type { get { return TokenType.Call; } }
+    public override string Text { get { return Children.Count > 0 ? Children[0].Text : payload.Text; } }
+
+    public CallNode(Token payload) : base(payload)
+    {
+      _args = new FunctionArguments(this);
+    }
 
     public override Expression BuildLinqExpression(ExpressionOptions options)
     {
@@ -17,7 +26,7 @@
         throw new InvalidOperationException();
 
       Expression firstExpression, secondExpression, thirdExpression;
-      switch (Children[0].Text)
+      switch (Text)
       {
         case "ceiling":
           firstExpression = Children[1].BuildLinqExpression(options);
@@ -38,7 +47,7 @@
           return Expression.Call(typeof(string), "Concat", null, new[] { firstExpression, secondExpression });
         case "date":
           firstExpression = Children[1].BuildLinqExpression(options);
-          
+
           if (!typeof(DateTime).IsAssignableFrom(firstExpression.Type) && !typeof(DateTimeOffset).IsAssignableFrom(firstExpression.Type))
             throw new FunctionNotSupportedException(firstExpression.Type, "date");
 

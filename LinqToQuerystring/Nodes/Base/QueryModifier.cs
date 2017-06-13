@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace LinqToQuerystring.TreeNodes.Base
+namespace LinqToQuerystring.Nodes.Base
 {
   using System.Linq;
 
-  public abstract class QueryModifier : TreeNode
+  public abstract class QueryModifier : ODataNode
   {
     protected QueryModifier(Token payload) : base(payload) { }
 

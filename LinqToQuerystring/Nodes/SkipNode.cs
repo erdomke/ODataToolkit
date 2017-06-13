@@ -1,12 +1,12 @@
-﻿namespace LinqToQuerystring.TreeNodes
+﻿namespace LinqToQuerystring.Nodes
 {
   using System;
   using System.Linq;
   using System.Linq.Expressions;
 
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class SkipNode : SingleChildNode
+  public class SkipNode : UnaryNode
   {
     public SkipNode(Token payload) : base(payload) { }
 
@@ -16,7 +16,7 @@
         , this.ChildNode.BuildLinqExpression(options));
     }
 
-    public override int CompareTo(TreeNode other)
+    public override int CompareTo(ODataNode other)
     {
       if (other is SkipNode)
       {

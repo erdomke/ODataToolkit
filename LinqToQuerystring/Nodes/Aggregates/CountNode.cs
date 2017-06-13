@@ -1,4 +1,4 @@
-﻿namespace LinqToQuerystring.TreeNodes.Aggregates
+﻿namespace LinqToQuerystring.Nodes.Aggregates
 {
   using System;
   using System.Collections;
@@ -6,9 +6,9 @@
   using System.Linq;
   using System.Linq.Expressions;
 
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class CountNode : TreeNode
+  public class CountNode : ODataNode
   {
     public CountNode(Token payload) : base(payload) { }
 

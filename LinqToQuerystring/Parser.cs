@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LinqToQuerystring.TreeNodes;
-using LinqToQuerystring.TreeNodes.Comparisons;
-using LinqToQuerystring.TreeNodes.Base;
-using LinqToQuerystring.TreeNodes.DataTypes;
-using LinqToQuerystring.TreeNodes.Aggregates;
+using LinqToQuerystring.Nodes;
+using LinqToQuerystring.Nodes.Base;
+using LinqToQuerystring.Nodes.DataTypes;
+using LinqToQuerystring.Nodes.Aggregates;
 
 namespace LinqToQuerystring
 {
   public class Parser
   {
-    private Stack<TreeNode> _output = new Stack<TreeNode>();
-    private Stack<TreeNode> _operators = new Stack<TreeNode>();
+    private Stack<ODataNode> _output = new Stack<ODataNode>();
+    private Stack<ODataNode> _operators = new Stack<ODataNode>();
     private IEnumerable<Token> _tokens;
     private StringBuilder _original = new StringBuilder();
     private ODataUri _uri;
@@ -28,7 +27,7 @@ namespace LinqToQuerystring
     public void Process()
     {
       var lastType = TokenType.Scheme;
-      var queryNode = default(TreeNode);
+      var queryNode = default(ODataNode);
 
       foreach (var token in _tokens)
       {
@@ -46,7 +45,7 @@ namespace LinqToQuerystring
               node = new AnyNode(token);
               break;
             default:
-              node = new FunctionNode(token);
+              node = new CallNode(token);
               break;
           }
           node.Children.Add(ident);
@@ -66,16 +65,21 @@ namespace LinqToQuerystring
         {
           switch (node.Type)
           {
+            case TokenType.Call:
             case TokenType.OpenParen:
               _operators.Push(node);
               break;
             case TokenType.CloseParen:
-              while (_operators.Count > 0 && _operators.Peek().Type != TokenType.OpenParen)
+              while (_operators.Count > 0
+                && _operators.Peek().Type != TokenType.OpenParen
+                && _operators.Peek().Type != TokenType.Call)
                 PopOperator();
-              if (_operators.Count > 0 && _operators.Peek().Type == TokenType.OpenParen)
+              if (_operators.Count > 0
+                && (_operators.Peek().Type == TokenType.OpenParen
+                  || _operators.Peek().Type == TokenType.Call))
               {
                 var op = _operators.Pop();
-                if (op is FunctionNode || op is AnyNode || op is AllNode)
+                if (op is CallNode || op is AnyNode || op is AllNode)
                 {
                   var child = _output.Pop();
                   if (child.Type == TokenType.Comma || child.Type == TokenType.Colon)
@@ -121,6 +125,14 @@ namespace LinqToQuerystring
       }
       CollectQueryTerms(query);
 
+      // Flatten path segments
+      var path = _output.Peek();
+      if (path.Type == TokenType.Question)
+      {
+        path = path.Children.First();
+      }
+      CollectSegments(path);
+
       // Restructure the OrderBy clause
       var orderBy = _uri.QueryOption["$orderBy"];
       if (orderBy != null && orderBy.Children.Count == 1)
@@ -159,7 +171,7 @@ namespace LinqToQuerystring
       }
     }
 
-    private void CollectQueryTerms(TreeNode node)
+    private void CollectQueryTerms(ODataNode node)
     {
       if (node.Type == TokenType.QueryName)
       {
@@ -174,11 +186,36 @@ namespace LinqToQuerystring
       }
     }
 
+    private void CollectSegments(ODataNode node)
+    {
+      if (node.Type == TokenType.PathSeparator)
+      {
+        foreach (var child in node.Children)
+        {
+          switch (child.Type)
+          {
+            case TokenType.Scheme:
+            case TokenType.Authority:
+            case TokenType.Port:
+            case TokenType.Colon:
+              break;
+            case TokenType.PathSeparator:
+              CollectSegments(child);
+              break;
+            default:
+              _uri.PathSegments.Add(child);
+              break;
+          }
+        }
+      }
+    }
+
     private void PopOperator()
     {
       var op = _operators.Pop();
-      if (op is TwoChildNode || op.Type == TokenType.Amperstand
-        || op.Type == TokenType.Navigation || op.Type == TokenType.Colon)
+      if (op is BinaryNode || op.Type == TokenType.Amperstand
+        || op.Type == TokenType.Navigation || op.Type == TokenType.Colon
+        || op.Type == TokenType.PathSeparator)
       {
         var right = _output.Pop();
         var left = _output.Pop();
@@ -195,22 +232,32 @@ namespace LinqToQuerystring
           _output.Push(op);
         }
       }
-      else if (op is SingleChildNode || op.Type == TokenType.Question || op is AscNode || op is DescNode)
+      else if (op is UnaryNode || op is AscNode || op is DescNode)
       {
-        op.Children.Insert(0, _output.Pop());
+        op.Children.Add(_output.Pop());
         _output.Push(op);
       }
-      else if (op.Type == TokenType.Equals)
+      else if (op.Type == TokenType.Question)
       {
-        var value = _output.Pop();
-        if (_output.Peek().Type == TokenType.QueryName)
+        op.Children.Add(_output.Pop());
+        if (_output.Count > 0)
+          op.Children.Insert(0, _output.Pop());
+        _output.Push(op);
+      }
+      else if (op.Type == TokenType.QueryAssign)
+      {
+        var right = _output.Pop();
+        var left = _output.Pop();
+
+        if (left.Type == TokenType.QueryName)
         {
-          _output.Peek().Children.Add(value);
+          left.Children.Add(right);
+          _output.Push(left);
         }
         else
         {
-          op.Children.Insert(0, _output.Pop());
-          op.Children.Insert(0, _output.Pop());
+          op.Children.Add(left);
+          op.Children.Add(right);
           _output.Push(op);
         }
       }
@@ -241,11 +288,11 @@ namespace LinqToQuerystring
       }
     }
 
-    private TreeNode FromToken(Token token, TreeNode queryNode)
+    private ODataNode FromToken(Token token, ODataNode queryNode)
     {
       switch (token.Type)
       {
-        case TokenType.Alias:
+        case TokenType.Parameter:
           return new AliasNode(token);
         case TokenType.Base64:
         case TokenType.Binary:
@@ -275,37 +322,22 @@ namespace LinqToQuerystring
           if (token.Text == "$count")
             return new CountNode(token);
           return new IdentifierNode(token);
-        case TokenType.Operator:
-          switch (token.Text)
-          {
-            case "and":
-              return new AndNode(token);
-            case "or":
-              return new OrNode(token);
-            case "eq":
-              return new EqualsNode(token);
-            case "ne":
-              return new NotEqualsNode(token);
-            case "lt":
-              return new LessThanNode(token);
-            case "le":
-              return new LessThanOrEqualNode(token);
-            case "gt":
-              return new GreaterThanNode(token);
-            case "ge":
-              return new GreaterThanOrEqualNode(token);
-            case "not":
-              return new NotNode(token);
-            //case "has":
-            //  return new Has(_inputType, token);
-            //case "add":
-            //case "sub":
-            //case "mul":
-            //case "div":
-            //case "mod":
-            default:
-              return new IgnoredNode(token);
-          }
+        case TokenType.And:
+        case TokenType.Or:
+        case TokenType.Equal:
+        case TokenType.NotEqual:
+        case TokenType.LessThan:
+        case TokenType.LessThanOrEqual:
+        case TokenType.GreaterThan:
+        case TokenType.GreaterThanOrEqual:
+        case TokenType.Add:
+        case TokenType.Subtract:
+        case TokenType.Multiply:
+        case TokenType.Divide:
+        case TokenType.Modulo:
+          return new BinaryNode(token);
+        case TokenType.Not:
+          return new NotNode(token);
         case TokenType.QueryName:
           switch (token.Text)
           {
@@ -315,14 +347,10 @@ namespace LinqToQuerystring
               return new SelectNode(token);
             case "$orderby":
               return new OrderByNode(token);
-            //case "$expand":
-            //  return new ExpandNode(token);
             case "$skip":
               return new SkipNode(token);
             case "$top":
               return new TopNode(token);
-            case "$inlinecount":
-              return new InlineCountNode(token);
             default:
               return new IgnoredNode(token);
           }
@@ -331,45 +359,49 @@ namespace LinqToQuerystring
       }
     }
 
-    private int GetPrecedence(TreeNode node)
+    private int GetPrecedence(ODataNode node)
     {
       // TODO: isof and cast
 
-      if (node.Type == TokenType.Navigation || node.Type == TokenType.Period)
+      if (node.Type == TokenType.Navigation
+        || node.Type == TokenType.Period)
         return 170;
-      else if (node.Type == TokenType.Operator && node.Text == "has")
+      else if (node.Type == TokenType.Has)
         return 170;
-      else if (node.Type == TokenType.Operator
-        && (node.Text == "-" || node.Text == "not"))
+      else if (node.Type == TokenType.Negate
+        || node.Type == TokenType.Not)
         return 160;
-      else if (node.Type == TokenType.Operator
-        && (node.Text == "mul" || node.Text == "div"
-         || node.Text == "mod"))
+      else if (node.Type == TokenType.Multiply
+        || node.Type == TokenType.Divide
+        || node.Type == TokenType.Modulo)
         return 150;
-      else if (node.Type == TokenType.Operator
-        && (node.Text == "add" || node.Text == "sub"))
+      else if (node.Type == TokenType.Add
+        || node.Type == TokenType.Subtract)
         return 140;
-      else if (node.Type == TokenType.Operator
-        && (node.Text == "gt" || node.Text == "ge"
-         || node.Text == "lt" || node.Text == "le"))
+      else if (node.Type == TokenType.GreaterThan
+        || node.Type == TokenType.LessThan
+        || node.Type == TokenType.GreaterThanOrEqual
+        || node.Type == TokenType.LessThanOrEqual)
         return 130;
-      else if (node.Type == TokenType.Operator
-        && (node.Text == "eq" || node.Text == "ne"))
+      else if (node.Type == TokenType.Equal
+        || node.Type == TokenType.NotEqual)
         return 120;
-      else if (node.Type == TokenType.Operator && node.Text == "and")
+      else if (node.Type == TokenType.And)
         return 110;
-      else if (node.Type == TokenType.Operator && node.Text == "or")
+      else if (node.Type == TokenType.Or)
         return 100;
       else if (node is AscNode || node is DescNode)
         return 95;
       else if (node.Type == TokenType.Comma || node.Type == TokenType.Colon)
         return 90;
-      else if (node.Type == TokenType.Equals)
+      else if (node.Type == TokenType.QueryAssign)
         return 80;
       else if (node.Type == TokenType.Amperstand)
         return 70;
-      else if (node.Type == TokenType.Question || node.Type == TokenType.PathSeparator)
+      else if (node.Type == TokenType.PathSeparator)
         return 60;
+      else if (node.Type == TokenType.Question)
+        return 50;
 
       return 0;
     }

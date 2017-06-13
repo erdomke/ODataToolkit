@@ -1,4 +1,4 @@
-﻿namespace LinqToQuerystring.TreeNodes.Base
+﻿namespace LinqToQuerystring.Nodes.Base
 {
   using System;
   using System.Collections.Generic;
@@ -7,16 +7,16 @@
   using System.Linq.Expressions;
 
   [DebuggerDisplay("{Text} {Type}")]
-  public abstract class TreeNode : IComparable<TreeNode>
+  public abstract class ODataNode : IComparable<ODataNode>
   {
-    private List<TreeNode> _children = new List<TreeNode>();
+    private List<ODataNode> _children = new List<ODataNode>();
 
     protected internal readonly Token payload;
 
-    public TokenType Type { get { return payload.Type; } }
-    public string Text { get { return payload.Text; } }
+    public virtual TokenType Type { get { return payload.Type; } }
+    public virtual string Text { get { return payload.Text; } }
 
-    protected TreeNode(Token payload)
+    protected ODataNode(Token payload)
     {
       this.payload = payload;
     }
@@ -24,14 +24,14 @@
     /// <summary>
     /// This hacky property overwrites the base property which has a bug when using tree rewrites
     /// </summary>
-    public IList<TreeNode> Children
+    public IList<ODataNode> Children
     {
       get { return _children; }
     }
 
     public abstract Expression BuildLinqExpression(ExpressionOptions options);
 
-    public virtual int CompareTo(TreeNode other)
+    public virtual int CompareTo(ODataNode other)
     {
       return 0;
     }

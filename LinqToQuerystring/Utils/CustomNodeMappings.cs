@@ -4,12 +4,12 @@
   using System.Collections.Generic;
   using System.Linq.Expressions;
   
-  using LinqToQuerystring.TreeNodes;
-  using LinqToQuerystring.TreeNodes.Base;
+  using LinqToQuerystring.Nodes;
+  using LinqToQuerystring.Nodes.Base;
 
-  public class CustomNodeMappings : Dictionary<TokenType, Func<Token, TreeNode>>
+  public class CustomNodeMappings : Dictionary<TokenType, Func<Token, ODataNode>>
   {
-    public TreeNode MapNode(TreeNode node, Expression expression)
+    public ODataNode MapNode(ODataNode node, Expression expression)
     {
       if (this.ContainsKey(node.Type))
       {
