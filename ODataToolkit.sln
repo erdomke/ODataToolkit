@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataToolkit", "ODataToolkit\ODataToolkit.csproj", "{7859C906-95D8-4322-AA44-BC854B065AEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataToolkit.UnitTests", "ODataToolkit.UnitTests\ODataToolkit.UnitTests.csproj", "{B60C3B0C-CAD7-4ED2-A1DD-7A6482504F31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataToolkit.IntegrationTests.Sql", "ODataToolkit.IntegrationTests\ODataToolkit.IntegrationTests.Sql.csproj", "{354C3452-BCDC-4048-B897-8CC719298B87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataToolkit.Tests", "ODataToolkit.Tests\ODataToolkit.Tests.csproj", "{139B0E4C-BC18-4180-8863-FB248CFDA42E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2313C896-8F93-46A4-9A5A-B148146256F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataToolkit.MsTests", "ODataToolkit.MsTests\ODataToolkit.MsTests.csproj", "{6C5B7B5A-373C-43F8-B815-C819D568632E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0B31B2E3-0916-44B5-8778-795F1706ABC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ODataToolkit.Nancy", "ODataToolkit.Nancy\ODataToolkit.Nancy.csproj", "{DB96BE22-D53E-4A1A-B77B-E15AF5CA632D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7859C906-95D8-4322-AA44-BC854B065AEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7859C906-95D8-4322-AA44-BC854B065AEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7859C906-95D8-4322-AA44-BC854B065AEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7859C906-95D8-4322-AA44-BC854B065AEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B60C3B0C-CAD7-4ED2-A1DD-7A6482504F31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B60C3B0C-CAD7-4ED2-A1DD-7A6482504F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B60C3B0C-CAD7-4ED2-A1DD-7A6482504F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B60C3B0C-CAD7-4ED2-A1DD-7A6482504F31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{354C3452-BCDC-4048-B897-8CC719298B87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{354C3452-BCDC-4048-B897-8CC719298B87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{354C3452-BCDC-4048-B897-8CC719298B87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{354C3452-BCDC-4048-B897-8CC719298B87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{139B0E4C-BC18-4180-8863-FB248CFDA42E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{139B0E4C-BC18-4180-8863-FB248CFDA42E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{139B0E4C-BC18-4180-8863-FB248CFDA42E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{139B0E4C-BC18-4180-8863-FB248CFDA42E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C5B7B5A-373C-43F8-B815-C819D568632E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5B7B5A-373C-43F8-B815-C819D568632E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C5B7B5A-373C-43F8-B815-C819D568632E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C5B7B5A-373C-43F8-B815-C819D568632E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB96BE22-D53E-4A1A-B77B-E15AF5CA632D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB96BE22-D53E-4A1A-B77B-E15AF5CA632D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB96BE22-D53E-4A1A-B77B-E15AF5CA632D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB96BE22-D53E-4A1A-B77B-E15AF5CA632D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B60C3B0C-CAD7-4ED2-A1DD-7A6482504F31} = {2313C896-8F93-46A4-9A5A-B148146256F3}
+		{354C3452-BCDC-4048-B897-8CC719298B87} = {2313C896-8F93-46A4-9A5A-B148146256F3}
+		{139B0E4C-BC18-4180-8863-FB248CFDA42E} = {2313C896-8F93-46A4-9A5A-B148146256F3}
+		{6C5B7B5A-373C-43F8-B815-C819D568632E} = {2313C896-8F93-46A4-9A5A-B148146256F3}
+		{DB96BE22-D53E-4A1A-B77B-E15AF5CA632D} = {0B31B2E3-0916-44B5-8778-795F1706ABC3}
+	EndGlobalSection
+EndGlobal
