@@ -58,14 +58,28 @@
   {
     private Because of = () => result = collection.AsQueryable().ExecuteOData("$filter=Age eq 25", dynamicAccessor: OData.DictionaryAccessor);
 
-    private It should_return_two_results = () => result.Count().ShouldEqual(1);
+    private It should_return_one_results = () => result.Count().ShouldEqual(1);
   }
 
   public class When_using_order_by_on_a_dynamic_type_with_force_dynamic_true : Dynamics
   {
     private Because of = () => result = collection.AsQueryable().ExecuteOData("$orderby=Age", dynamicAccessor: OData.DictionaryAccessor);
 
-    private It should_return_two_results = () => result.Count().ShouldEqual(4);
+    private It should_return_four_results = () => result.Count().ShouldEqual(4);
+  }
+
+  public class When_using_implicit_boolean_filter : Dynamics
+  {
+    private Because of = () => result = collection.AsQueryable().ExecuteOData("$filter=IsValid", dynamicAccessor: OData.DictionaryAccessor);
+
+    private It should_return_three_results = () => result.Count().ShouldEqual(3);
+  }
+
+  public class When_using_implicit_boolean_not_filter : Dynamics
+  {
+    private Because of = () => result = collection.AsQueryable().ExecuteOData("$filter=not IsValid", dynamicAccessor: OData.DictionaryAccessor);
+
+    private It should_return_one_results = () => result.Count().ShouldEqual(1);
   }
 
   #endregion

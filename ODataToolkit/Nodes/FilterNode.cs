@@ -14,8 +14,19 @@
     {
       var parameter = options.Item ?? Expression.Parameter(options.InputType, "o");
       var body = this.ChildNode.BuildLinqExpression(options.Clone().WithItem(parameter));
-      if (!typeof(bool).IsAssignableFrom(body.Type))
+
+      if (typeof(bool).IsAssignableFrom(body.Type))
+      {
+        // Do nothing
+      }
+      else if (typeof(bool?).IsAssignableFrom(body.Type))
+      {
         body = Expression.Coalesce(body, Expression.Constant(false));
+      }
+      else
+      {
+        body = Expression.Convert(body, typeof(bool));
+      }
 
       var lambda = Expression.Lambda(body, new[] { parameter as ParameterExpression });
       return Expression.Call(typeof(Queryable), "Where"

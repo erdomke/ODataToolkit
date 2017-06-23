@@ -10,7 +10,8 @@ namespace ODataToolkit.MsTests
   {
     private void VerifySequence(string value, params TokenType[] types)
     {
-      var actual = OData.Tokenize(value).Select(t => t.Type).ToArray();
+      var tokens = OData.Tokenize(value).ToArray();
+      var actual = tokens.Select(t => t.Type).ToArray();
       CollectionAssert.AreEqual(types, actual);
     }
 
@@ -161,6 +162,20 @@ namespace ODataToolkit.MsTests
       var parts = OData.Tokenize(url).ToArray();
       Assert.AreEqual("Smartphone/Tablet", parts[8].AsPrimitive());
     }
+
+    [TestMethod]
+    public void Tokens_Escape()
+    {
+      var url = "?$callback=jQuery112304312923812233427_1494592722830&%24inlinecount=allpages&%24format=json&%24filter=startswith(tolower(name)%2C%27c%27)";
+      VerifySequence(url
+        , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+        , TokenType.Amperstand, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+        , TokenType.Amperstand, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+        , TokenType.Amperstand, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
+        , TokenType.OpenParen, TokenType.Identifier, TokenType.OpenParen, TokenType.Identifier, TokenType.CloseParen
+        , TokenType.Comma, TokenType.String, TokenType.CloseParen);
+    }
+
 
     [TestMethod]
     public void Tokens_FilterQuery01()

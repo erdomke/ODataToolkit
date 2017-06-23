@@ -46,6 +46,7 @@ namespace ODataToolkit
       if (_idx >= _value.Length)
         return false;
 
+      int charLength;
       for (var i = _idx; i < _value.Length; i++)
       {
         switch (_state)
@@ -115,7 +116,7 @@ namespace ODataToolkit
                 }
                 break;
             }
-            if (TryUnencode(i) == '(')
+            if (TryUnencode(i, out charLength) == '(')
             {
               _current = new Token(TokenType.Identifier, _value.Substring(_idx, i - _idx));
               _state = State.ParamOpen;
@@ -259,38 +260,38 @@ namespace ODataToolkit
                 return true;
               }
 
-              switch (TryUnencode(_idx))
+              switch (TryUnencode(_idx, out charLength))
               {
                 case '*':
                   _current = new Token(TokenType.Star, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case '.':
                   _current = new Token(TokenType.Period, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case '/':
                   _current = new Token(TokenType.Navigation, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case ',':
                   _current = new Token(TokenType.Comma, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case '(':
                   _current = new Token(TokenType.OpenParen, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case ')':
                   _current = new Token(TokenType.CloseParen, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case ':':
                   _current = new Token(TokenType.Colon, _value.Substring(_idx, 1));
-                  _idx = i + 1;
+                  _idx = i + charLength;
                   return true;
                 case '$':
-                  _idx++;
+                  _idx += charLength;
                   _current = TryConsumeIdentifier();
                   if (_current == null)
                     throw new ParseException(_value, _idx);
@@ -329,7 +330,8 @@ namespace ODataToolkit
     public Token TryConsumeWhitespace()
     {
       var i = _idx;
-      while (_value[i] == '+' || TryUnencode(i) == ' ')
+      int charLength;
+      while (_value[i] == '+' || TryUnencode(i, out charLength) == ' ')
       {
         if (_value[i] == ' ' || _value[i] == '+')
           i++;
@@ -371,12 +373,16 @@ namespace ODataToolkit
       return false;
     }
 
-    public char TryUnencode(int index)
+    public char TryUnencode(int index, out int length)
     {
       int ascii;
       if (_value[index] != '%' || (index + 2) >= _value.Length
         || !int.TryParse(_value.Substring(index + 1, 2), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ascii))
+      {
+        length = 1;
         return _value[index];
+      }
+      length = 3;
       return (char)ascii;
     }
 
@@ -481,7 +487,8 @@ namespace ODataToolkit
     {
       Token result;
 
-      switch (TryUnencode(_idx))
+      int charLength;
+      switch (TryUnencode(_idx, out charLength))
       {
         case 'n':
           if ((_idx + 4) <= _value.Length && _value.Substring(_idx, 4) == "null")
@@ -589,7 +596,7 @@ namespace ODataToolkit
             ?? TryConsumeTimeOfDay()
             ?? TryConsumeNumber();
         case '\'':
-          var i = _idx + 1;
+          var i = _idx + charLength;
           while (i < _value.Length)
           {
             if (TryConsumeChar(ref i, '\''))
