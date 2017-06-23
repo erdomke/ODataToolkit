@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ODataToolkit</id>
+    <version>0.7.0.18</version>
+    <title>ODataToolkit</title>
+    <authors>Eric Domke</authors>
+    <owners>Eric Domke</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/erdomke/ODataToolkit/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/erdomke/ODataToolkit</projectUrl>
+    <description>Toolkit for developing OData web services.  Can be used from Web API, Nancy, or the platform of your choice.</description>
+    <language>en-US</language>
+    <tags>OData,service</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework3.5" />
+      <group targetFramework=".NETFramework4.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework3.5" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework3.5" />
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.0" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.0" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.0" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

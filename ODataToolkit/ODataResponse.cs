@@ -5,8 +5,8 @@ using System.Text;
 
 namespace ODataToolkit
 {
-  class ODataResponse
-  {
+  //class ODataResponse
+  //{
 
-  }
+  //}
 }
