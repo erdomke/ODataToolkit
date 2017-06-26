@@ -166,7 +166,7 @@ namespace ODataToolkit.MsTests
     [TestMethod]
     public void Tokens_Escape()
     {
-      var url = "?$callback=jQuery112304312923812233427_1494592722830&%24inlinecount=allpages&%24format=json&%24filter=startswith(tolower(name)%2C%27c%27)";
+      var url = "?$callback=jQuery112304312923812233427_1494592722830&%24inlinecount=allpages&%24format=json&%24filter=startswith(tolower(name)%2C%27c+b%27)";
       VerifySequence(url
         , TokenType.Question, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
         , TokenType.Amperstand, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
@@ -174,6 +174,8 @@ namespace ODataToolkit.MsTests
         , TokenType.Amperstand, TokenType.QueryName, TokenType.QueryAssign, TokenType.Identifier
         , TokenType.OpenParen, TokenType.Identifier, TokenType.OpenParen, TokenType.Identifier, TokenType.CloseParen
         , TokenType.Comma, TokenType.String, TokenType.CloseParen);
+      var parts = OData.Tokenize(url).ToArray();
+      Assert.AreEqual("c b", parts[parts.Length - 2].AsPrimitive());
     }
 
 

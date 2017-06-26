@@ -28,7 +28,11 @@ namespace ODataToolkit
     /// <summary>
     /// Version(s) of OData which are supported
     /// </summary>
-    public ODataVersion Version { get { return _version; } }
+    public ODataVersion Version
+    {
+      get { return _version; }
+      internal set { _version = value; }
+    }
 
     /// <summary>
     /// Execute the query represented by an OData URI against an <c>IQueryable</c> data source

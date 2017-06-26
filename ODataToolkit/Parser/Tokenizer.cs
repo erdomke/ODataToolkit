@@ -11,10 +11,11 @@ namespace ODataToolkit
   {
     private ODataVersion _versionSupport;
 
-    private string _value;
+    private Token _current;
+    private bool _decodeUri;
     private int _idx;
     private State _state;
-    private Token _current;
+    private string _value;
 
     public Token Current { get { return _current; } }
     object IEnumerator.Current { get { return _current; } }
@@ -34,10 +35,11 @@ namespace ODataToolkit
       UnknownQueryValue,
     }
 
-    internal Tokenizer(string value, ODataVersion version = ODataVersion.All)
+    internal Tokenizer(string value, ODataVersion version = ODataVersion.All, bool decodeUri = true)
     {
       _value = value;
       _versionSupport = version;
+      _decodeUri = decodeUri;
       Reset();
     }
 
@@ -352,36 +354,36 @@ namespace ODataToolkit
       if (index >= _value.Length)
         return false;
 
-      int ascii;
-      if (_value[index] != '%' || (index + 2) >= _value.Length
-        || !int.TryParse(_value.Substring(index + 1, 2), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ascii))
+      int length;
+      var ch = TryUnencode(index, out length);
+      if (ch == match)
       {
-        if (_value[index] == match)
-        {
-          index++;
-          return true;
-        }
-        return false;
-      }
-
-
-      if ((char)ascii == match)
-      {
-        index += 3;
+        index += length;
         return true;
       }
+
       return false;
     }
 
     public char TryUnencode(int index, out int length)
     {
       int ascii;
-      if (_value[index] != '%' || (index + 2) >= _value.Length
+      // + encoded in the query string
+      if (_decodeUri && _value[index] == '+' && (_state == State.QueryValue || _state == State.UnknownQueryValue))
+      {
+        length = 1;
+        return ' ';
+      }
+
+      // % encoding
+      if (!_decodeUri || _value[index] != '%'
+        || (index + 2) >= _value.Length
         || !int.TryParse(_value.Substring(index + 1, 2), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ascii))
       {
         length = 1;
         return _value[index];
       }
+
       length = 3;
       return (char)ascii;
     }
@@ -611,7 +613,10 @@ namespace ODataToolkit
               i++;
             }
           }
-          result = new Token(TokenType.String, _value.Substring(_idx, i - _idx));
+          if (_state == State.QueryValue || _state == State.UnknownQueryValue)
+            result = new Token(TokenType.String, _value.Substring(_idx, i - _idx).Replace('+', ' '));
+          else
+            result = new Token(TokenType.String, _value.Substring(_idx, i - _idx));
           _idx = i;
           return result;
       }

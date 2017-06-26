@@ -28,9 +28,9 @@
     /// </summary>
     /// <param name="uri">OData URI</param>
     /// <param name="version">Which version(s) to support</param>
-    public static IEnumerable<Token> Tokenize(string uri, ODataVersion version = ODataVersion.All)
+    public static IEnumerable<Token> Tokenize(string uri, ODataVersion version = ODataVersion.All, bool decodeUri = true)
     {
-      var tokenizer = new Tokenizer(uri, version);
+      var tokenizer = new Tokenizer(uri, version, decodeUri);
       while (tokenizer.MoveNext())
         yield return tokenizer.Current;
     }
@@ -44,7 +44,9 @@
     {
       var parser = new Parser(tokens);
       parser.Process();
-      return parser.Uri;
+      var result = parser.Uri;
+      result.Version = version;
+      return result;
     }
 
     /// <summary>
@@ -52,11 +54,11 @@
     /// </summary>
     /// <param name="tokens">OData URI</param>
     /// <param name="version">Which version(s) to support</param>
-    public static ODataUri Parse(string value, ODataVersion version = ODataVersion.All)
+    public static ODataUri Parse(string value, ODataVersion version = ODataVersion.All, bool decodeUri = true)
     {
       if (string.IsNullOrEmpty(value))
         return new ODataUri("?");
-      return Tokenize(value, version).Parse(version);
+      return Tokenize(value, version, decodeUri).Parse(version);
     }
 
     /// <summary>
