@@ -153,62 +153,7 @@
 
   #endregion
 
-  #region Filter on string escape character tests
-
-  public class When_using_eq_filter_on_a_single_string_with_escaped_slash : SqlFiltering
-  {
-    private Because of =
-        () => edgeCaseResult = testDb.EdgeCaseCollection.ExecuteOData(@"?$filter=Name eq 'Apple\\Bob'").ToList();
-
-    private It should_return_one_record = () => edgeCaseResult.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_matches = () => edgeCaseResult.ShouldEachConformTo(o => o.Name == "Apple\\Bob");
-  }
-
-  public class When_using_eq_filter_on_a_single_string_with_escaped_backspace : SqlFiltering
-  {
-    private Because of = () => edgeCaseResult = testDb.EdgeCaseCollection.ExecuteOData(@"?$filter=Name eq 'Apple\bBob'").ToList();
-
-    private It should_return_one_record = () => edgeCaseResult.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_matches = () => edgeCaseResult.ShouldEachConformTo(o => o.Name == "Apple\bBob");
-  }
-
-  public class When_using_eq_filter_on_a_single_string_with_escaped_tab : SqlFiltering
-  {
-    private Because of = () => edgeCaseResult = testDb.EdgeCaseCollection.ExecuteOData(@"?$filter=Name eq 'Apple\tBob'").ToList();
-
-    private It should_return_one_record = () => edgeCaseResult.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_matches = () => edgeCaseResult.ShouldEachConformTo(o => o.Name == "Apple\tBob");
-  }
-
-  public class When_using_eq_filter_on_a_single_string_with_escaped_newline : SqlFiltering
-  {
-    private Because of = () => edgeCaseResult = testDb.EdgeCaseCollection.ExecuteOData(@"?$filter=Name eq 'Apple\nBob'").ToList();
-
-    private It should_return_one_record = () => edgeCaseResult.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_matches = () => edgeCaseResult.ShouldEachConformTo(o => o.Name == "Apple\nBob");
-  }
-
-  public class When_using_eq_filter_on_a_single_string_with_escaped_formfeed : SqlFiltering
-  {
-    private Because of = () => edgeCaseResult = testDb.EdgeCaseCollection.ExecuteOData(@"?$filter=Name eq 'Apple\fBob'").ToList();
-
-    private It should_return_one_record = () => edgeCaseResult.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_matches = () => edgeCaseResult.ShouldEachConformTo(o => o.Name == "Apple\fBob");
-  }
-
-  public class When_using_eq_filter_on_a_single_string_with_escaped_carriage_return : SqlFiltering
-  {
-    private Because of = () => edgeCaseResult = testDb.EdgeCaseCollection.ExecuteOData(@"?$filter=Name eq 'Apple\rBob'").ToList();
-
-    private It should_return_one_record = () => edgeCaseResult.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_matches = () => edgeCaseResult.ShouldEachConformTo(o => o.Name == "Apple\rBob");
-  }
+  #region Filter on escaped string tests
 
   public class When_using_eq_filter_on_a_single_string_with_quote : SqlFiltering
   {

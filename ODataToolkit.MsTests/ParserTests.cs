@@ -75,12 +75,20 @@ namespace ODataToolkit.MsTests
     public void Parse_Url()
     {
       var tree = OData.Parse("http://host/service/ProductsByColor(color=@color)?@color='red'&callback=2func&random=3*stuff");
-      Assert.AreEqual(2, tree.PathSegments.Count);
-      Assert.AreEqual("service", tree.PathSegments[0].Text);
-      Assert.AreEqual("ProductsByColor", tree.PathSegments[1].Text);
-      Assert.AreEqual(TokenType.Call, tree.PathSegments[1].Type);
-      var call = (CallNode)tree.PathSegments[1];
+      var segments = tree.PathSegments.ToArray();
+      Assert.AreEqual(2, segments.Length);
+      Assert.AreEqual("service", segments[0].Text);
+      Assert.AreEqual("ProductsByColor", segments[1].Text);
+      Assert.AreEqual(TokenType.Call, segments[1].Type);
+      var call = (CallNode)segments[1];
       Assert.AreEqual("'red'", call.Arguments["color"].Text);
-     }
+    }
+
+    [TestMethod]
+    public void Parse_AndClone()
+    {
+      var uri = OData.Parse("http://localhost:53645/_api/V4/Products?$filter=Id%20gt%203&$select=Id%2CName%2CDescription&$orderby=Description&$top=1000");
+      Assert.AreEqual("http://localhost:53645/_api/V4/Products?$filter=Id gt 3&$select=Id,Name,Description&$orderby=Description&$top=1000", uri.ToString());
+    }
   }
 }

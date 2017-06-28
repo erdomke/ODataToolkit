@@ -11,15 +11,15 @@
   {
     private List<ODataNode> _children = new List<ODataNode>();
 
-    protected internal readonly Token payload;
+    protected internal readonly Token _payload;
 
     internal ODataUri Uri { get; set; }
-    public virtual TokenType Type { get { return payload.Type; } }
-    public virtual string Text { get { return payload.Text; } }
+    public virtual TokenType Type { get { return _payload.Type; } }
+    public virtual string Text { get { return _payload.Text; } }
 
     protected ODataNode(Token payload)
     {
-      this.payload = payload;
+      this._payload = payload;
     }
 
     /// <summary>
@@ -135,6 +135,53 @@
       }
 
       return produces(leftExpression, rightExpression);
+    }
+
+    public override string ToString()
+    {
+      return Text;
+    }
+
+    public static BinaryNode And(ODataNode left, ODataNode right)
+    {
+      var result = new BinaryNode(new Token(TokenType.And, "and"));
+      result.Children.Add(left);
+      result.Children.Add(right);
+      return result;
+    }
+    public static BinaryNode Equals(ODataNode left, ODataNode right)
+    {
+      var result = new BinaryNode(new Token(TokenType.Equal, "eq"));
+      result.Children.Add(left);
+      result.Children.Add(right);
+      return result;
+    }
+    public static FilterNode Filter(ODataNode expr)
+    {
+      var result = new FilterNode(new Token(TokenType.QueryName, "$filter"));
+      result.Children.Add(expr);
+      return result;
+    }
+    public static IdentifierNode Identifier(string ident)
+    {
+      return new IdentifierNode(new Token(TokenType.Identifier, ident));
+    }
+    public static LiteralNode Literal(object value)
+    {
+      return new LiteralNode(Token.FromPrimative(value));
+    }
+    public static BinaryNode Or(ODataNode left, ODataNode right)
+    {
+      var result = new BinaryNode(new Token(TokenType.Or, "or"));
+      result.Children.Add(left);
+      result.Children.Add(right);
+      return result;
+    }
+    public static TopNode Top(ODataNode expr)
+    {
+      var result = new TopNode(new Token(TokenType.QueryName, "$top"));
+      result.Children.Add(expr);
+      return result;
     }
   }
 }

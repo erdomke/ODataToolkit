@@ -38,12 +38,13 @@ namespace ODataToolkit
     private object GetPrimative(string key)
     {
       var node = this[key];
-      if (node == null)
+      if (node is PlaceholderNode)
         return null;
 
       var literal = (LiteralNode)node.Children.Single().GetValueNode();
       return literal.AsPrimitive();
     }
+
     private void SetPrimative(string key, object value, Func<Token, ODataNode> factory)
     {
       if (value == null)
@@ -53,7 +54,7 @@ namespace ODataToolkit
       }
 
       var node = this[key];
-      if (node == null)
+      if (node is PlaceholderNode)
       {
         node = factory(new Token(TokenType.QueryName, key));
         this.Add(node);
@@ -74,7 +75,8 @@ namespace ODataToolkit
       get
       {
         return _nodes
-          .LastOrDefault(n => string.Equals(n.Text, name, StringComparison.OrdinalIgnoreCase));
+          .LastOrDefault(n => string.Equals(n.Text, name, StringComparison.OrdinalIgnoreCase))
+          ?? PlaceholderNode.Instance;
       }
     }
 

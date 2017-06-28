@@ -13,7 +13,7 @@
 
     public FunctionArguments Arguments { get { return _args; } }
     public override TokenType Type { get { return TokenType.Call; } }
-    public override string Text { get { return Children.Count > 0 ? Children[0].Text : payload.Text; } }
+    public override string Text { get { return Children.Count > 0 ? Children[0].Text : _payload.Text; } }
 
     public CallNode(Token payload) : base(payload)
     {

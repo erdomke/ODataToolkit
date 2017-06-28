@@ -205,7 +205,7 @@ namespace ODataToolkit
               CollectSegments(child);
               break;
             default:
-              _uri.PathSegments.Add(child);
+              _uri.AddSegment(child);
               break;
           }
         }
@@ -219,6 +219,10 @@ namespace ODataToolkit
         || op.Type == TokenType.Navigation || op.Type == TokenType.Colon
         || op.Type == TokenType.PathSeparator)
       {
+        // Bail early on the trailing separator
+        if (op.Type == TokenType.PathSeparator && _output.Count < 2)
+          return;
+
         var right = _output.Pop();
         var left = _output.Pop();
 

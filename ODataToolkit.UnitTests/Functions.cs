@@ -88,17 +88,6 @@
         () => result.ShouldEachConformTo(o => o.Name.Contains("Mond") || o.Name.Contains("Tues"));
   }
 
-  public class When_filtering_on_substringof_function_with_escape_character : Filtering
-  {
-    private Because of =
-        () => result = edgeCaseCollection.AsQueryable().ExecuteOData(@"?$filter=substringof('\\',Name)");
-
-    private It should_return_one_record = () => result.Count().ShouldEqual(1);
-
-    private It should_only_return_records_where_name_contains_escaped_slash =
-        () => result.ShouldEachConformTo(o => o.Name.Contains("\\"));
-  }
-
   public class When_filtering_on_substringof_function_with_tolower : Functions
   {
     private Because of =

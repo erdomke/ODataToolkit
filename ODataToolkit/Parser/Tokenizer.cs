@@ -9,7 +9,7 @@ namespace ODataToolkit
 {
   public class Tokenizer : IEnumerator<Token>
   {
-    private ODataVersion _versionSupport;
+    private ODataVersion _versions;
 
     private Token _current;
     private bool _decodeUri;
@@ -38,7 +38,7 @@ namespace ODataToolkit
     internal Tokenizer(string value, ODataVersion version = ODataVersion.All, bool decodeUri = true)
     {
       _value = value;
-      _versionSupport = version;
+      _versions = version;
       _decodeUri = decodeUri;
       Reset();
     }
@@ -265,31 +265,31 @@ namespace ODataToolkit
               switch (TryUnencode(_idx, out charLength))
               {
                 case '*':
-                  _current = new Token(TokenType.Star, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.Star, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case '.':
-                  _current = new Token(TokenType.Period, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.Period, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case '/':
-                  _current = new Token(TokenType.Navigation, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.Navigation, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case ',':
-                  _current = new Token(TokenType.Comma, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.Comma, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case '(':
-                  _current = new Token(TokenType.OpenParen, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.OpenParen, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case ')':
-                  _current = new Token(TokenType.CloseParen, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.CloseParen, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case ':':
-                  _current = new Token(TokenType.Colon, _value.Substring(_idx, 1));
+                  _current = new Token(TokenType.Colon, _value.Substring(_idx, charLength));
                   _idx = i + charLength;
                   return true;
                 case '$':
@@ -320,6 +320,10 @@ namespace ODataToolkit
           case State.PathStart:
           case State.UnknownQueryValue:
             _current = new Token(TokenType.Identifier, _value.Substring(_idx));
+            _idx = _value.Length;
+            return true;
+          case State.PathSeparator:
+            _current = new Token(TokenType.PathSeparator, _value.Substring(_idx));
             _idx = _value.Length;
             return true;
         }
@@ -506,7 +510,7 @@ namespace ODataToolkit
             return new Token(TokenType.NaN, "NaN");
           }
           else if ((_idx + 4) <= _value.Length
-            && SupportV2OrV3()
+            && _versions.SupportsV2OrV3()
             && (_value.Substring(_idx, 4) == "NaNd"
               || _value.Substring(_idx, 4) == "NaND"
               || _value.Substring(_idx, 4) == "NaNf"
@@ -553,7 +557,7 @@ namespace ODataToolkit
             return new Token(TokenType.PosInfinity, "INF");
           }
           else if ((_idx + 4) <= _value.Length
-            && SupportV2OrV3()
+            && _versions.SupportsV2OrV3()
             && (_value.Substring(_idx, 4) == "INFd"
               || _value.Substring(_idx, 4) == "INFD"
               || _value.Substring(_idx, 4) == "INFf"
@@ -573,7 +577,7 @@ namespace ODataToolkit
             return new Token(TokenType.NegInfinity, "-INF");
           }
           else if ((_idx + 5) <= _value.Length
-            && SupportV2OrV3()
+            && _versions.SupportsV2OrV3()
             && (_value.Substring(_idx, 5) == "-INFd"
               || _value.Substring(_idx, 5) == "-INFD"
               || _value.Substring(_idx, 5) == "-INFf"
@@ -629,7 +633,7 @@ namespace ODataToolkit
       if ((_idx + 36) > _value.Length)
         return null;
 
-      if (SupportV4()
+      if (_versions.SupportsV4()
           && IsHexPhrase(_idx, _idx + 8)
           && _value[_idx + 8] == '-'
           && IsHexPhrase(_idx + 9, _idx + 13)
@@ -644,7 +648,7 @@ namespace ODataToolkit
         return new Token(TokenType.Guid, _value.Substring(_idx - 36, 36));
       }
 
-      if (SupportV2OrV3()
+      if (_versions.SupportsV2OrV3()
         && (_idx + 42) <= _value.Length
         && _value.Substring(_idx, 5) == "guid'"
         && IsHexPhrase(_idx + 5, _idx + 13)
@@ -675,12 +679,12 @@ namespace ODataToolkit
         && _value.Substring(_idx, 7) == "binary'")
       {
         start = 7;
-        if (!SupportV4())
+        if (!_versions.SupportsV4())
           type = TokenType.Binary;
       }
       else if ((_idx + 2) <= _value.Length
         && _value.Substring(_idx, 2) == "X'"
-        && SupportV2OrV3())
+        && _versions.SupportsV2OrV3())
       {
         start = 2;
         type = TokenType.Binary;
@@ -769,10 +773,10 @@ namespace ODataToolkit
       }
 
       // Prefix required for v2 & v3
-      if (!SupportV4() && !startsWithPrefix)
+      if (!_versions.SupportsV4() && !startsWithPrefix)
         return null;
       // Prefix should not be there for v4
-      if (!SupportV2OrV3() && startsWithPrefix)
+      if (!_versions.SupportsV2OrV3() && startsWithPrefix)
         return null;
       // Make sure there are enough characters
       if (startsWithPrefix && (_idx + 10 + length) > _value.Length)
@@ -849,13 +853,13 @@ namespace ODataToolkit
     private Token TryConsumeDuration()
     {
       var i = _idx;
-      if (SupportV4()
+      if (_versions.SupportsV4()
         && (_idx + 9) <= _value.Length
         && _value.Substring(_idx, 9) == "duration'")
       {
         i += 9;
       }
-      else if (SupportV2OrV3()
+      else if (_versions.SupportsV2OrV3()
         && (_idx + 5) <= _value.Length
         && _value.Substring(_idx, 5) == "time'")
       {
@@ -974,7 +978,7 @@ namespace ODataToolkit
         while (i < _value.Length && char.IsDigit(_value[i]))
           i++;
       }
-      else if (SupportV2OrV3()
+      else if (_versions.SupportsV2OrV3()
         && i < _value.Length
         && _value[i] == 'L')
       {
@@ -994,7 +998,7 @@ namespace ODataToolkit
             i++;
         }
       }
-      else if (SupportV2OrV3()
+      else if (_versions.SupportsV2OrV3()
         && i < _value.Length
         && (_value[i] == 'M' || _value[i] == 'm')
         && type != TokenType.Long)
@@ -1003,14 +1007,14 @@ namespace ODataToolkit
         type = TokenType.Decimal;
       }
 
-      if (SupportV2OrV3()
+      if (_versions.SupportsV2OrV3()
         && i < _value.Length
         && (_value[i] == 'D' || _value[i] == 'd'))
       {
         i++;
         type = TokenType.Double;
       }
-      else if (SupportV2OrV3()
+      else if (_versions.SupportsV2OrV3()
         && i < _value.Length
         && (_value[i] == 'F' || _value[i] == 'f'))
       {
@@ -1063,24 +1067,6 @@ namespace ODataToolkit
     {
       _idx = 0;
       _state = State.PathStart;
-    }
-
-    private bool SupportV4()
-    {
-      return (_versionSupport & ODataVersion.v4) == ODataVersion.v4;
-    }
-    private bool SupportV3()
-    {
-      return (_versionSupport & ODataVersion.v3) == ODataVersion.v3;
-    }
-    private bool SupportV2()
-    {
-      return (_versionSupport & ODataVersion.v2) == ODataVersion.v2;
-    }
-    private bool SupportV2OrV3()
-    {
-      return (_versionSupport & ODataVersion.v3) == ODataVersion.v3
-        || (_versionSupport & ODataVersion.v2) == ODataVersion.v2;
     }
 
     public void Dispose()

@@ -12,12 +12,12 @@
 
     public override Expression BuildLinqExpression(ExpressionOptions options)
     {
-      return Expression.Constant(payload.AsPrimitive());
+      return Expression.Constant(_payload.AsPrimitive());
     }
 
     public object AsPrimitive()
     {
-      return payload.AsPrimitive();
+      return _payload.AsPrimitive();
     }
   }
 
