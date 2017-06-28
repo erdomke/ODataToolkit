@@ -5,9 +5,6 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Collections.Generic;
 
-#if !NO_DYNAMIC
-using System.Dynamic;
-#endif
 
 namespace ODataToolkit.FastMember
 {
@@ -77,18 +74,6 @@ namespace ODataToolkit.FastMember
         return obj;
       }
     }
-#if !NO_DYNAMIC
-    sealed class DynamicAccessor : TypeAccessor
-    {
-      public static readonly DynamicAccessor Singleton = new DynamicAccessor();
-      private DynamicAccessor() { }
-      public override object this[object target, string name]
-      {
-        get { return CallSiteCache.GetValue(name, target); }
-        set { CallSiteCache.SetValue(name, target, value); }
-      }
-    }
-#endif
 
     private static AssemblyBuilder assembly;
     private static ModuleBuilder module;
@@ -280,13 +265,6 @@ namespace ODataToolkit.FastMember
     }
     static TypeAccessor CreateNew(Type type, bool allowNonPublicAccessors)
     {
-#if !NO_DYNAMIC
-      if (typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type))
-      {
-        return DynamicAccessor.Singleton;
-      }
-#endif
-
       PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
       FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
       Dictionary<string, int> map = new Dictionary<string, int>();

@@ -1,7 +1,4 @@
 ﻿using System;
-#if !NO_DYNAMIC
-using System.Dynamic;
-#endif
 
 
 namespace ODataToolkit.FastMember
@@ -54,10 +51,6 @@ namespace ODataToolkit.FastMember
     public static ObjectAccessor Create(object target, bool allowNonPublicAccessors)
     {
       if (target == null) throw new ArgumentNullException("target");
-#if !NO_DYNAMIC
-      IDynamicMetaObjectProvider dlr = target as IDynamicMetaObjectProvider;
-      if (dlr != null) return new DynamicWrapper(dlr); // use the DLR
-#endif
       return new TypeAccessorWrapper(target, TypeAccessor.Create(target.GetType(), allowNonPublicAccessors));
     }
     sealed class TypeAccessorWrapper : ObjectAccessor
@@ -79,26 +72,6 @@ namespace ODataToolkit.FastMember
         get { return target; }
       }
     }
-#if !NO_DYNAMIC
-    sealed class DynamicWrapper : ObjectAccessor
-    {
-      private readonly IDynamicMetaObjectProvider target;
-      public override object Target
-      {
-        get { return target; }
-      }
-      public DynamicWrapper(IDynamicMetaObjectProvider target)
-      {
-        this.target = target;
-      }
-      public override object this[string name]
-      {
-        get { return CallSiteCache.GetValue(name, target); }
-        set { CallSiteCache.SetValue(name, target, value); }
-      }
-
-    }
-#endif
   }
 
 }

@@ -533,7 +533,6 @@
     <Compile Include="Edm\Vocabularies\Values\IEdmValue.cs" />
     <Compile Include="Exceptions\InvalidEscapeSequenceException.cs" />
     <Compile Include="ExecutionSettings.cs" />
-    <Compile Include="FastMember\CallSiteCache.cs" />
     <Compile Include="FastMember\MemberSet.cs" />
     <Compile Include="FastMember\ObjectAccessor.cs" />
     <Compile Include="FastMember\ObjectReader.cs" />
