@@ -136,7 +136,7 @@ namespace ODataToolkit
         foreach (var record in _records)
         {
           json.WriteStartObject();
-          WriteJsonItem(json, _path, record, _uri.Version.OnlySupportsV2OrV3());
+          WriteJsonItem(json, _path, record, _uri.Version == ODataVersion.v2);
           json.WriteEndObject();
         }
         json.WriteEndArray();

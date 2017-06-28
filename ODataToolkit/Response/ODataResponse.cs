@@ -229,25 +229,41 @@ namespace ODataToolkit
       foreach (var prop in record)
       {
         json.WritePropertyName(prop.Key);
-        var dict = prop.Value as IEnumerable<KeyValuePair<string, object>>;
-        var arr = prop.Value as IEnumerable;
+        RenderValue(json, prop.Value);
+      }
+    }
+
+    private void RenderValue(JsonTextWriter json, object value)
+    {
+      if (value == null)
+      {
+        json.WriteValue(value);
+      }
+      else
+      {
+        var dict = value as IEnumerable<KeyValuePair<string, object>>;
+        var arr = value as IEnumerable;
         DateTime date;
         if (dict != null)
         {
           json.WriteStartObject();
-          WriteJsonItem(json, path, dict, false);
+          foreach (var kvp in dict)
+          {
+            json.WritePropertyName(kvp.Key);
+            RenderValue(json, kvp.Value);
+          }
           json.WriteEndObject();
         }
-        else if (arr != null && !(prop.Value is string))
+        else if (arr != null && !(value is string))
         {
           json.WriteStartArray();
           foreach (var val in arr)
           {
-            json.WriteValue(val);
+            RenderValue(json, val);
           }
           json.WriteEndArray();
         }
-        else if (TryGetUtcDate(prop.Value, out date))
+        else if (TryGetUtcDate(value, out date))
         {
           if (_uri.Version.SupportsV4() || _uri.Version.SupportsV3())
             json.WriteValue(date.ToString("s") + "Z");
@@ -258,7 +274,7 @@ namespace ODataToolkit
         }
         else
         {
-          json.WriteValue(prop.Value);
+          json.WriteValue(value);
         }
       }
     }
@@ -291,36 +307,66 @@ namespace ODataToolkit
       {
         xml.WriteStartElement(prop.Key, ns_d);
         var meta = entity.FindProperty(prop.Key);
-        if (prop.Value == null)
-        {
-          xml.WriteAttributeString("null", ns_m, "true");
-        }
-        else
-        {
-          if (!meta.Type.IsString())
-          {
-            var typeName = meta.Type.FullName();
-            if (_uri.Version.SupportsV4() && typeName.StartsWith("Edm."))
-              typeName = typeName.Substring(4);
-            xml.WriteAttributeString("type", ns_m, typeName);
-          }
-
-          DateTime date;
-          if (TryGetUtcDate(prop.Value, out date))
-          {
-            xml.WriteValue(date.ToString("s") + "Z");
-          }
-          else
-          {
-            xml.WriteValue(prop.Value);
-          }
-        }
+        RenderValue(xml, prop.Value, meta.Type);
         xml.WriteEndElement();
       }
       xml.WriteEndElement();
       xml.WriteEndElement();
 
       xml.WriteEndElement();
+    }
+
+    private void RenderValue(XmlWriter xml, object value, IEdmTypeReference type)
+    {
+      if (value == null)
+      {
+        xml.WriteAttributeString("null", ns_m, "true");
+      }
+      else
+      {
+        if (!type.IsString())
+        {
+          var typeName = type.FullName();
+          if (_uri.Version.SupportsV4() && typeName.StartsWith("Edm."))
+            typeName = typeName.Substring(4);
+          xml.WriteAttributeString("type", ns_m, typeName);
+        }
+
+        var arr = value is string ? null : value as IEnumerable;
+        var dict = value as IDictionary<string, object>;
+        DateTime date;
+        if (arr != null)
+        {
+          var coll = (IEdmCollectionTypeReference)type;
+          var elemType = coll.ElementType();
+          foreach (var elem in arr)
+          {
+            xml.WriteStartElement("element", ns_d);
+            if (!elemType.IsPrimitive())
+              xml.WriteAttributeString("type", ns_m, elemType.FullName());
+            RenderValue(xml, elem, elemType);
+            xml.WriteEndElement();
+          }
+        }
+        else if (dict != null)
+        {
+          var complex = (IEdmComplexTypeReference)type;
+          foreach (var kvp in dict)
+          {
+            xml.WriteStartElement(kvp.Key, ns_d);
+            RenderValue(xml, value, complex.FindProperty(kvp.Key).Type);
+            xml.WriteEndElement();
+          }
+        }
+        else if (TryGetUtcDate(value, out date))
+        {
+          xml.WriteValue(date.ToString("s") + "Z");
+        }
+        else
+        {
+          xml.WriteValue(value);
+        }
+      }
     }
 
     private bool TryGetUtcDate(object value, out DateTime date)
