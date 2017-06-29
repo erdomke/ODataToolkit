@@ -357,6 +357,8 @@ namespace ODataToolkit
               return new SkipNode(token);
             case "$top":
               return new TopNode(token);
+            case "$expand":
+              return new ExpandNode(token);
             default:
               return new IgnoredNode(token);
           }

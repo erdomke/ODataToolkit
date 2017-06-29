@@ -335,7 +335,17 @@ namespace ODataToolkit
         var arr = value is string ? null : value as IEnumerable;
         var dict = value as IDictionary<string, object>;
         DateTime date;
-        if (arr != null)
+        if (dict != null && type is IEdmComplexTypeReference)
+        {
+          var complex = (IEdmComplexTypeReference)type;
+          foreach (var kvp in dict)
+          {
+            xml.WriteStartElement(kvp.Key, ns_d);
+            RenderValue(xml, kvp.Value, complex.FindProperty(kvp.Key).Type);
+            xml.WriteEndElement();
+          }
+        }
+        else if (arr != null && type is IEdmCollectionTypeReference)
         {
           var coll = (IEdmCollectionTypeReference)type;
           var elemType = coll.ElementType();
@@ -345,16 +355,6 @@ namespace ODataToolkit
             if (!elemType.IsPrimitive())
               xml.WriteAttributeString("type", ns_m, elemType.FullName());
             RenderValue(xml, elem, elemType);
-            xml.WriteEndElement();
-          }
-        }
-        else if (dict != null)
-        {
-          var complex = (IEdmComplexTypeReference)type;
-          foreach (var kvp in dict)
-          {
-            xml.WriteStartElement(kvp.Key, ns_d);
-            RenderValue(xml, value, complex.FindProperty(kvp.Key).Type);
             xml.WriteEndElement();
           }
         }

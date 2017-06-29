@@ -538,6 +538,7 @@
     <Compile Include="FastMember\ObjectReader.cs" />
     <Compile Include="FastMember\TypeAccessor.cs" />
     <Compile Include="FastMember\TypeHelpers.cs" />
+    <Compile Include="Nodes\ExpandNode.cs" />
     <Compile Include="Nodes\PlaceholderNode.cs" />
     <Compile Include="ODataEnumerableBase.cs" />
     <Compile Include="ODataEnumerable.cs" />
@@ -587,6 +588,7 @@
     <Compile Include="ODataVersion.cs" />
     <Compile Include="Response\ODataServiceResponse.cs" />
     <Compile Include="Response\SwaggerResponse.cs" />
+    <Compile Include="Util\DbExtensions.cs" />
     <Compile Include="Util\JsonTextWriter.cs" />
     <Compile Include="Util\Utils.cs" />
   </ItemGroup>

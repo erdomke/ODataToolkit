@@ -576,7 +576,10 @@ namespace ODataToolkit
       foundMethod = null;
       try
       {
-        foundMethod = type.GetMethod(name, parameterTypes);
+        if (parameterTypes == null || parameterTypes.Length < 1)
+          foundMethod = type.GetMethod(name);
+        else
+          foundMethod = type.GetMethod(name, parameterTypes);
         return foundMethod != null;
       }
       catch (ArgumentNullException)

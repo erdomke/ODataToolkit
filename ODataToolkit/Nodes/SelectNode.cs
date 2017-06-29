@@ -8,7 +8,7 @@
 
   using ODataToolkit.Nodes.Base;
 
-  public class SelectNode : UnaryNode
+  public class SelectNode : ODataNode
   {
     public SelectNode(Token payload) : base(payload) { }
 

@@ -24,6 +24,7 @@ expression that can be used with an `IQueryable` data source.
   * `$filter` for simple properties & subproperties
   * `$select` for simple properties
   * `$inlinecount` (v2, v3) and `$count` (v4)
+  * `$expand` if the `IQueryable` has a method with the signature `IQueryable Include(string path)`
   * Functions and collection aggregates such as `any()` and `all()` with predicates
   * Parameters, for example `$filter=Name eq @value&$@value='thing'`
 
