@@ -77,8 +77,9 @@ namespace ODataToolkit
       var children = this.QueryOption.Where(n => !(n is IgnoredNode) && !(n is AliasNode)).ToList();
 
       // Try and do an ID lookup if applicable
-      var functionNode = _segments.Skip(_rootSegmentCount).FirstOrDefault() as CallNode;
-      if (functionNode != null)
+      var segments = PathSegments.ToArray();
+      var functionNode = segments.FirstOrDefault() as CallNode;
+      if (functionNode != null && segments.Length == 1)
       {
         var entity = ((IEdmCollectionType)path.Type).ElementType.ToStructuredType() as IEdmEntityType;
         if (entity != null && entity.Key().Count() == functionNode.Arguments.Count)
