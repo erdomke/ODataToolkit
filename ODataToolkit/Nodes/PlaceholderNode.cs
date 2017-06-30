@@ -11,6 +11,8 @@ namespace ODataToolkit.Nodes
   {
     private PlaceholderNode() : base(new Token(TokenType.Whitespace, "")) { }
 
+    public override bool Exists { get { return false; } }
+
     public override Expression BuildLinqExpression(ExpressionOptions options)
     {
       return options.Expression;

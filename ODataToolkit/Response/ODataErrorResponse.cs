@@ -14,6 +14,8 @@ namespace ODataToolkit
     private bool _renderDetails;
     private string _language;
 
+    public override int StatusCode { get { return 400; } }
+
     public override ResponseFormat Format
     {
       get { return _format; }

@@ -16,7 +16,7 @@ namespace ODataToolkit
     public Token(TokenType type, string value)
     {
       this.Type = type;
-      this.Text = Uri.UnescapeDataString(value);
+      this.Text = value;
     }
 
     public object AsPrimitive()

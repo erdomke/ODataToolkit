@@ -110,14 +110,16 @@ namespace ODataToolkit
     protected Dictionary<string, string> _headers = new Dictionary<string, string>();
 
     /// <summary>
+    /// Format to render the response in (XML or JSON)
+    /// </summary>
+    public abstract ResponseFormat Format { get; set; }
+
+    /// <summary>
     /// Headers to include with the HTTP response
     /// </summary>
     public IDictionary<string, string> Headers { get { return _headers; } }
 
-    /// <summary>
-    /// Format to render the response in (XML or JSON)
-    /// </summary>
-    public abstract ResponseFormat Format { get; set; }
+    public virtual int StatusCode { get { return 200; } }
 
     /// <summary>
     /// Write the response as either XML or JSON (based on the <see cref="Format"/> property)

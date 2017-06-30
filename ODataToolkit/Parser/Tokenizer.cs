@@ -37,10 +37,40 @@ namespace ODataToolkit
 
     internal Tokenizer(string value, ODataVersion version = ODataVersion.All, bool decodeUri = true)
     {
-      _value = value;
+      _value = UriDecode(value);
       _versions = version;
       _decodeUri = decodeUri;
       Reset();
+    }
+
+    private string UriDecode(string value)
+    {
+      if (value == null)
+        return null;
+
+      var output = new char[value.Length];
+      var o = 0;
+      var inQuery = false;
+      byte ascii;
+      for (var i = 0; i < value.Length; i++)
+      {
+        inQuery = inQuery || value[i] == '?';
+        if (value[i] == '%' && i + 2 < value.Length
+          && byte.TryParse(value.Substring(i + 1, 2), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ascii))
+        {
+          output[o++] = (char)ascii;
+          i += 2;
+        }
+        else if (inQuery && value[i] == '+')
+        {
+          output[o++] = ' ';
+        }
+        else
+        {
+          output[o++] = value[i];
+        }
+      }
+      return new string(output, 0, o);
     }
 
     public bool MoveNext()
@@ -48,7 +78,6 @@ namespace ODataToolkit
       if (_idx >= _value.Length)
         return false;
 
-      int charLength;
       for (var i = _idx; i < _value.Length; i++)
       {
         switch (_state)
@@ -118,7 +147,7 @@ namespace ODataToolkit
                 }
                 break;
             }
-            if (TryUnencode(i, out charLength) == '(')
+            if (_value[i] == '(')
             {
               _current = new Token(TokenType.Identifier, _value.Substring(_idx, i - _idx));
               _state = State.ParamOpen;
@@ -262,38 +291,38 @@ namespace ODataToolkit
                 return true;
               }
 
-              switch (TryUnencode(_idx, out charLength))
+              switch (_value[_idx])
               {
                 case '*':
-                  _current = new Token(TokenType.Star, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.Star, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case '.':
-                  _current = new Token(TokenType.Period, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.Period, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case '/':
-                  _current = new Token(TokenType.Navigation, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.Navigation, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case ',':
-                  _current = new Token(TokenType.Comma, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.Comma, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case '(':
-                  _current = new Token(TokenType.OpenParen, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.OpenParen, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case ')':
-                  _current = new Token(TokenType.CloseParen, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.CloseParen, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case ':':
-                  _current = new Token(TokenType.Colon, _value.Substring(_idx, charLength));
-                  _idx = i + charLength;
+                  _current = new Token(TokenType.Colon, _value.Substring(_idx, 1));
+                  _idx = i + 1;
                   return true;
                 case '$':
-                  _idx += charLength;
+                  _idx++;
                   _current = TryConsumeIdentifier();
                   if (_current == null)
                     throw new ParseException(_value, _idx);
@@ -336,14 +365,8 @@ namespace ODataToolkit
     public Token TryConsumeWhitespace()
     {
       var i = _idx;
-      int charLength;
-      while (_value[i] == '+' || TryUnencode(i, out charLength) == ' ')
-      {
-        if (_value[i] == ' ' || _value[i] == '+')
-          i++;
-        else
-          i += 3;
-      }
+      while (_value[i] == ' ')
+        i++;
 
       if (i == _idx)
         return null;
@@ -358,38 +381,13 @@ namespace ODataToolkit
       if (index >= _value.Length)
         return false;
 
-      int length;
-      var ch = TryUnencode(index, out length);
-      if (ch == match)
+      if (_value[index] == match)
       {
-        index += length;
+        index += 1;
         return true;
       }
 
       return false;
-    }
-
-    public char TryUnencode(int index, out int length)
-    {
-      int ascii;
-      // + encoded in the query string
-      if (_decodeUri && _value[index] == '+' && (_state == State.QueryValue || _state == State.UnknownQueryValue))
-      {
-        length = 1;
-        return ' ';
-      }
-
-      // % encoding
-      if (!_decodeUri || _value[index] != '%'
-        || (index + 2) >= _value.Length
-        || !int.TryParse(_value.Substring(index + 1, 2), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out ascii))
-      {
-        length = 1;
-        return _value[index];
-      }
-
-      length = 3;
-      return (char)ascii;
     }
 
     public Token TryConsumeAlias()
@@ -493,8 +491,7 @@ namespace ODataToolkit
     {
       Token result;
 
-      int charLength;
-      switch (TryUnencode(_idx, out charLength))
+      switch (_value[_idx])
       {
         case 'n':
           if ((_idx + 4) <= _value.Length && _value.Substring(_idx, 4) == "null")
@@ -602,7 +599,7 @@ namespace ODataToolkit
             ?? TryConsumeTimeOfDay()
             ?? TryConsumeNumber();
         case '\'':
-          var i = _idx + charLength;
+          var i = _idx + 1;
           while (i < _value.Length)
           {
             if (TryConsumeChar(ref i, '\''))

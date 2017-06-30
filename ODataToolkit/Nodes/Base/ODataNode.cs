@@ -13,9 +13,10 @@
 
     protected internal readonly Token _payload;
 
-    internal ODataUri Uri { get; set; }
-    public virtual TokenType Type { get { return _payload.Type; } }
+    public virtual bool Exists { get { return true; } }
     public virtual string Text { get { return _payload.Text; } }
+    public virtual TokenType Type { get { return _payload.Type; } }
+    internal ODataUri Uri { get; set; }
 
     protected ODataNode(Token payload)
     {

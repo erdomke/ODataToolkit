@@ -90,5 +90,12 @@ namespace ODataToolkit.MsTests
       var uri = OData.Parse("http://localhost:53645/_api/V4/Products?$filter=Id%20gt%203&$select=Id%2CName%2CDescription&$orderby=Description&$top=1000");
       Assert.AreEqual("http://localhost:53645/_api/V4/Products?$filter=Id gt 3&$select=Id,Name,Description&$orderby=Description&$top=1000", uri.ToString());
     }
+
+    [TestMethod]
+    public void Parse_VerifySegments()
+    {
+      var uri = OData.Parse("http://localhost:50359/QA/_api/int/v2/Lab_Test/?$callback=jQuery112405806855772931012_1498853440769&%24inlinecount=allpages&%24format=json&%24filter=(test_lab+eq+%27EMC%27+and+test_end+ge+datetime%272017-06-01T00%3A00%3A00%27+and+test_start+le+datetime%272017-07-01T00%3A00%3A00%27+and+(state+eq+%27Approved%27+or+state+eq+%27In+Process%27+or+state+eq+%27Not+Initiated%27+or+state+eq+%27Ready+to+Schedule%27+or+state+eq+%27Report+Review%27+or+state+eq+%27Testing+Complete%27))");
+      Assert.AreEqual(5, uri.PathSegments.Count());
+    }
   }
 }
