@@ -290,7 +290,8 @@ namespace ODataToolkit
           else
             json.WriteRaw(@"""\/Date(")
               .WriteRaw(((long)(date - UnixEpoch).TotalMilliseconds).ToString())
-              .WriteRaw(@")\/""");
+              .WriteRaw(@")\/""")
+              .NeedsComma();
         }
         else
         {

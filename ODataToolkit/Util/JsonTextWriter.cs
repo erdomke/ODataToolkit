@@ -38,6 +38,12 @@ namespace ODataToolkit
       _disposeWriter = disposeWriter;
     }
 
+    public JsonTextWriter NeedsComma()
+    {
+      _needsComma = true;
+      return this;
+    }
+
     public JsonTextWriter WriteStartObject()
     {
       if (_needsComma) _writer.Write(",");
