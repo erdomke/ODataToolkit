@@ -138,7 +138,17 @@ namespace ODataToolkit
       {
         using (var writer = new StreamWriter(stream))
         {
+          var callback = _uri.QueryOption["$callback"].ToString();
+          if (!string.IsNullOrEmpty(callback))
+          {
+            writer.Write(callback);
+            writer.Write("(");
+          }
           WriteJson(writer);
+          if (!string.IsNullOrEmpty(callback))
+          {
+            writer.Write(")");
+          }
         }
       }
     }
