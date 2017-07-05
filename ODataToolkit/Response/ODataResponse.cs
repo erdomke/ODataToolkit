@@ -16,6 +16,7 @@ namespace ODataToolkit
   {
     protected const string ns_feed = "http://www.w3.org/2005/Atom";
     private readonly static DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private string _callback;
 
     /// <summary>
     /// Create an OData response from a list of items
@@ -129,25 +130,28 @@ namespace ODataToolkit
     {
       if (Format == ResponseFormat.Xml)
       {
-        using (var xml = XmlWriter.Create(stream))
+        var settings = new XmlWriterSettings()
+        {
+          Encoding = Encoding.UTF8
+        };
+        using (var xml = XmlWriter.Create(stream, settings))
         {
           WriteXml(xml);
         }
       }
       else
       {
-        using (var writer = new StreamWriter(stream))
+        using (var writer = new StreamWriter(stream, Encoding.UTF8))
         {
-          var callback = _uri.QueryOption["$callback"].Exists ? _uri.QueryOption["$callback"].Child().ToString() : null;
-          if (!string.IsNullOrEmpty(callback))
+          if (!string.IsNullOrEmpty(_callback))
           {
-            writer.Write(callback);
+            writer.Write(_callback);
             writer.Write("(");
           }
           WriteJson(writer);
-          if (!string.IsNullOrEmpty(callback))
+          if (!string.IsNullOrEmpty(_callback))
           {
-            writer.Write(")");
+            writer.Write(");");
           }
         }
       }
@@ -185,6 +189,10 @@ namespace ODataToolkit
         Format = ResponseFormat.Json;
       else
         Format = ResponseFormat.Default;
+
+      _callback = _uri.QueryOption["$callback"].Child().Text;
+      if (Format == ResponseFormat.Json && !string.IsNullOrEmpty(_callback))
+        _headers["Content-Type"] = "text/javascript;charset=utf-8";
 
       if (_uri.Version.SupportsV4())
         _headers["OData-Version"] = "4.0";
