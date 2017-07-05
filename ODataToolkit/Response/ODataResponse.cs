@@ -138,7 +138,7 @@ namespace ODataToolkit
       {
         using (var writer = new StreamWriter(stream))
         {
-          var callback = _uri.QueryOption["$callback"].ToString();
+          var callback = _uri.QueryOption["$callback"].Exists ? _uri.QueryOption["$callback"].Child().ToString() : null;
           if (!string.IsNullOrEmpty(callback))
           {
             writer.Write(callback);
