@@ -27,7 +27,7 @@ namespace ODataToolkit
 
     public ODataQueryable<TOut> Cast<TOut>()
     {
-      return new ODataQueryable<TOut>(_child, _uri);
+      return new ODataQueryable<TOut>(_child, _uri) { LookupByKey = LookupByKey };
     }
     
     /// <summary>

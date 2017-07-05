@@ -43,7 +43,17 @@ namespace ODataToolkit
       using (var json = new JsonTextWriter(writer, false))
       {
         json.WriteStartObject();
-        WriteJsonItem(json, _path, _record, true);
+        if (_uri.Version == ODataVersion.v2)
+        {
+          json.WritePropertyName("d");
+          json.WriteStartObject();
+          WriteJsonItem(json, _path, _record, true);
+          json.WriteEndObject();
+        }
+        else
+        {
+          WriteJsonItem(json, _path, _record, true);
+        }
         json.WriteEndObject();
       }
     }
