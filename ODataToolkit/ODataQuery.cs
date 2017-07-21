@@ -16,7 +16,7 @@ namespace ODataToolkit
     {
       get
       {
-        return (int?)GetPrimative("$skip");
+        return (int?)this["$skip"].AsPrimitive();
       }
       set
       {
@@ -27,22 +27,12 @@ namespace ODataToolkit
     {
       get
       {
-        return (int?)GetPrimative("$top");
+        return (int?)this["$top"].AsPrimitive();
       }
       set
       {
         SetPrimative("$top", value, t => new TopNode(t));
       }
-    }
-
-    private object GetPrimative(string key)
-    {
-      var node = this[key];
-      if (node is PlaceholderNode)
-        return null;
-
-      var literal = (LiteralNode)node.Children.Single().GetValueNode();
-      return literal.AsPrimitive();
     }
 
     private void SetPrimative(string key, object value, Func<Token, ODataNode> factory)

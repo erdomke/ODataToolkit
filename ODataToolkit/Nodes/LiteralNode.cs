@@ -15,7 +15,7 @@
       return Expression.Constant(_payload.AsPrimitive());
     }
 
-    public object AsPrimitive()
+    public object ToPrimitive()
     {
       return _payload.AsPrimitive();
     }

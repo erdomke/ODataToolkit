@@ -69,7 +69,7 @@
       }
       return ODataVersion.All;
     }
-    
+
     /// <summary>
     /// Break an OData URI into a flat stream of tokens
     /// </summary>
@@ -146,6 +146,19 @@
       if (node.Children.Count == 1)
         return node.Children[0];
       throw new InvalidOperationException("OData node contains more than one child.");
+    }
+
+    /// <summary>
+    /// Return the primitive value of a literal node (or the literal value
+    /// referenced by an alias node).
+    /// </summary>
+    public static object AsPrimitive(this ODataNode node)
+    {
+      if (node is PlaceholderNode)
+        return null;
+
+      var literal = (LiteralNode)node.Children.Single().GetValueNode();
+      return literal.ToPrimitive();
     }
   }
 }
