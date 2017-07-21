@@ -157,7 +157,7 @@
       if (node is PlaceholderNode)
         return null;
 
-      var literal = (LiteralNode)node.Children.Single().GetValueNode();
+      var literal = (LiteralNode)node.GetValueNode();
       return literal.ToPrimitive();
     }
   }
