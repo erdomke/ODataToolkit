@@ -116,7 +116,7 @@ namespace ODataToolkit
 
           if (inlineCount)
           {
-            json.WriteProperty("@odata.context", _totalCount ?? _records.Count());
+            json.WriteProperty("@odata.count", _totalCount ?? _records.Count());
           }
 
           json.WritePropertyName("value");

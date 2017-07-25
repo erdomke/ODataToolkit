@@ -110,6 +110,50 @@
         () => result.ShouldEachConformTo(o => o.Name.Contains("Sat"));
   }
 
+  public class When_filtering_on_contains_function : Functions
+  {
+    private Because of =
+        () => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=contains(Name,'urn')");
+
+    private It should_return_three_records = () => result.Count().ShouldEqual(3);
+
+    private It should_only_return_records_where_name_contains_urn =
+        () => result.ShouldEachConformTo(o => o.Name.Contains("urn"));
+  }
+
+  public class When_filtering_on_multiple_contains_functions : Functions
+  {
+    private Because of =
+        () => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=(contains(Name,'Mond')) or (contains(Name,'Tues'))");
+
+    private It should_return_three_records = () => result.Count().ShouldEqual(2);
+
+    private It should_only_return_records_where_name_contains_urn =
+        () => result.ShouldEachConformTo(o => o.Name.Contains("Mond") || o.Name.Contains("Tues"));
+  }
+
+  public class When_filtering_on_contains_function_with_tolower : Functions
+  {
+    private Because of =
+        () => result = concreteCollection.AsQueryable().ExecuteOData(@"?$filter=contains(tolower(Name),'sat')");
+
+    private It should_return_four_records = () => result.Count().ShouldEqual(4);
+
+    private It should_only_return_records_where_name_contains_sat =
+        () => result.ShouldEachConformTo(o => o.Name.Contains("Sat"));
+  }
+
+  public class When_filtering_on_contains_function_with_toupper : Functions
+  {
+    private Because of =
+        () => result = concreteCollection.AsQueryable().ExecuteOData(@"?$filter=contains(toupper(Name),'SAT')");
+
+    private It should_return_four_records = () => result.Count().ShouldEqual(4);
+
+    private It should_only_return_records_where_name_contains_sat =
+        () => result.ShouldEachConformTo(o => o.Name.Contains("Sat"));
+  }
+
   public class When_filtering_on_year_function : Functions
   {
     private Because of =

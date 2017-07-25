@@ -79,6 +79,17 @@
         };
   }
 
+  #region Nested properties
+  public class When_using_eq_filter_on_a_nested_property : Filtering
+  {
+    private Because of = () => complexResult = complexCollection.AsQueryable().ExecuteOData("?$format=json&$filter=Concrete/Name eq 'Apple'");
+
+    private It should_return_two_records = () => complexResult.Count().ShouldEqual(2);
+
+    private It should_only_return_records_where_name_is_apple = () => complexResult.ShouldEachConformTo(o => o.Concrete.Name == "Apple");
+  }
+  #endregion
+
   #region Ignored operators
 
   public class When_using_eq_filter_on_a_single_with_a_leading_superflouous_operator : Filtering

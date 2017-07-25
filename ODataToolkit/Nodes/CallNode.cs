@@ -45,6 +45,17 @@
             secondExpression = Expression.Convert(secondExpression, typeof(string));
 
           return Expression.Call(typeof(string), "Concat", null, new[] { firstExpression, secondExpression });
+        case "contains":
+          firstExpression = Children[1].BuildLinqExpression(options);
+          secondExpression = Children[2].BuildLinqExpression(options);
+
+          if (!typeof(string).IsAssignableFrom(firstExpression.Type))
+            firstExpression = Expression.Convert(firstExpression, typeof(string));
+
+          if (!typeof(string).IsAssignableFrom(secondExpression.Type))
+            secondExpression = Expression.Convert(secondExpression, typeof(string));
+
+          return Expression.Call(firstExpression, "Contains", null, new[] { secondExpression });
         case "date":
           firstExpression = Children[1].BuildLinqExpression(options);
 
