@@ -84,7 +84,18 @@
   {
     private Because of = () => complexResult = complexCollection.AsQueryable().ExecuteOData("?$format=json&$filter=Concrete/Name eq 'Apple'");
 
-    private It should_return_two_records = () => complexResult.Count().ShouldEqual(2);
+    private It should_return_one_record = () => complexResult.Count().ShouldEqual(1);
+
+    private It should_only_return_records_where_name_is_apple = () => complexResult.ShouldEachConformTo(o => o.Concrete.Name == "Apple");
+  }
+  #endregion
+
+  #region Nested properties
+  public class When_using_eq_filter_on_multiple_nested_properties : Filtering
+  {
+    private Because of = () => complexResult = complexCollection.AsQueryable().ExecuteOData("?$format=json&$filter=Concrete/Name eq 'Apple' and Concrete/Age eq 5");
+
+    private It should_return_one_record = () => complexResult.Count().ShouldEqual(1);
 
     private It should_only_return_records_where_name_is_apple = () => complexResult.ShouldEachConformTo(o => o.Concrete.Name == "Apple");
   }

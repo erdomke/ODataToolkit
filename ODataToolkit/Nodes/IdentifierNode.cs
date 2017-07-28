@@ -26,7 +26,7 @@
         var parent = options.Item;
         foreach (var child in this.Children)
         {
-          parent = child.BuildLinqExpression(options.WithItem(parent));
+          parent = child.BuildLinqExpression(options.Clone().WithItem(parent));
         }
         return parent;
       }
