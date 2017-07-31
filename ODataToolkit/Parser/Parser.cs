@@ -253,19 +253,17 @@ namespace ODataToolkit
       else if (op.Type == TokenType.QueryAssign)
       {
         var right = _output.Pop();
-        var left = _output.Pop();
 
-        //if (left.Type == TokenType.QueryName)
-        //{
+        if (right.Type == TokenType.QueryName)
+        {
+          _output.Push(right);
+        }
+        else
+        {
+          var left = _output.Pop();
           left.Children.Add(right);
           _output.Push(left);
-        //}
-        //else
-        //{
-        //  op.Children.Add(left);
-        //  op.Children.Add(right);
-        //  _output.Push(op);
-        //}
+        }
       }
       else if (op.Type == TokenType.Comma)
       {
