@@ -81,17 +81,20 @@ namespace ODataToolkit
                 var op = _operators.Pop();
                 if (op is CallNode || op is AnyNode || op is AllNode)
                 {
-                  var child = _output.Pop();
-                  if (child.Type == TokenType.Comma || child.Type == TokenType.Colon)
+                  if (lastType != TokenType.OpenParen)
                   {
-                    foreach (var c in child.Children)
+                    var child = _output.Pop();
+                    if (child.Type == TokenType.Comma || child.Type == TokenType.Colon)
                     {
-                      op.Children.Add(c);
+                      foreach (var c in child.Children)
+                      {
+                        op.Children.Add(c);
+                      }
                     }
-                  }
-                  else
-                  {
-                    op.Children.Add(child);
+                    else
+                    {
+                      op.Children.Add(child);
+                    }
                   }
                   _output.Push(op);
                 }

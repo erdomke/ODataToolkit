@@ -14,7 +14,7 @@
 
     private Because of = () => ex = Catch.Exception(() => result = testDb.ConcreteCollection.ExecuteOData("?$skip=1").ToList());
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<NotSupportedException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<NotSupportedException>();
   }
 
   public class When_trying_to_order_by_complex_types : SqlPagingAndOrdering
@@ -23,6 +23,6 @@
 
     private Because of = () => ex = Catch.Exception(() => complexResult = testDb.ComplexCollection.ExecuteOData("?$orderby=concrete").ToList());
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<ArgumentException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<ArgumentException>();
   }
 }

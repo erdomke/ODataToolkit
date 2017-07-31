@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace ODataToolkit
 {
-  class ODataEdmxResponse : ODataResponse
+  internal class ODataEdmxResponse : ODataResponse
   {
     private IEdmModel _model;
     private ResponseFormat _format;

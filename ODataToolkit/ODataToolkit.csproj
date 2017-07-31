@@ -586,6 +586,7 @@
     <Compile Include="Nodes\TopNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ODataVersion.cs" />
+    <Compile Include="Response\ODataResponseBase.cs" />
     <Compile Include="Response\ODataServiceResponse.cs" />
     <Compile Include="Response\SwaggerResponse.cs" />
     <Compile Include="Util\DbExtensions.cs" />

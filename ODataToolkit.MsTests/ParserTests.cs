@@ -96,8 +96,19 @@ namespace ODataToolkit.MsTests
     {
       var uri = OData.Parse("http://localhost:50359/QA/_api/int/v2/Lab_Test/?$callback=jQuery112405806855772931012_1498853440769&%24inlinecount=allpages&%24format=json&%24filter=(test_lab+eq+%27EMC%27+and+test_end+ge+datetime%272017-06-01T00%3A00%3A00%27+and+test_start+le+datetime%272017-07-01T00%3A00%3A00%27+and+(state+eq+%27Approved%27+or+state+eq+%27In+Process%27+or+state+eq+%27Not+Initiated%27+or+state+eq+%27Ready+to+Schedule%27+or+state+eq+%27Report+Review%27+or+state+eq+%27Testing+Complete%27))");
       Assert.AreEqual(5, uri.PathSegments.Count());
+    }
 
-      uri = OData.Parse("http://localhost:50359/DEV/_api/int/v2/Plan%20Template?callback=jQuery11240908378691521541_1501273153206&values%5B0%5D=&_=1501273153209");
+    [TestMethod]
+    public void Parse_VerifySegments_EmptyQuery()
+    {
+      var uri = OData.Parse("http://localhost:50359/DEV/_api/int/v2/Plan%20Template?callback=jQuery11240908378691521541_1501273153206&values%5B0%5D=&_=1501273153209");
+      Assert.AreEqual(5, uri.PathSegments.Count());
+    }
+
+    [TestMethod]
+    public void Parse_VerifySegments_EmptyFunctionArgs()
+    {
+      var uri = OData.Parse("http://localhost:50359/DEV/_api/int/v2/Active_Identities()?$callback=jQuery112406300001408986726_1501513316775&%24inlinecount=allpages&%24format=json&%24top=250");
       Assert.AreEqual(5, uri.PathSegments.Count());
     }
   }

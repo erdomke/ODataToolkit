@@ -14,28 +14,28 @@
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Name gt 'B'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   public class When_using_ge_filter_on_a_single_string : Filtering
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Name ge 'B'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   public class When_using_lt_filter_on_a_single_string : Filtering
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Name lt 'B'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   public class When_using_le_filter_on_a_single_string : Filtering
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Name lt 'B'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   #endregion
@@ -46,28 +46,28 @@
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Complete gt false"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   public class When_using_ge_filter_on_a_single_bool : Filtering
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Complete ge datetime'2003-01-01T00:00'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   public class When_using_lt_filter_on_a_single_bool : Filtering
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Complete lt datetime'2003-01-01T00:00'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   public class When_using_le_filter_on_a_single_bool : Filtering
   {
     private Because of = () => ex = Catch.Exception(() => result = concreteCollection.AsQueryable().ExecuteOData("?$filter=Complete le datetime'2003-01-01T00:00'"));
 
-    private It should_throw_an_exception = () => ex.ShouldBeOfType<InvalidOperationException>();
+    private It should_throw_an_exception = () => ex.ShouldBeAssignableTo<InvalidOperationException>();
   }
 
   #endregion

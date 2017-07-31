@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ODataToolkit
 {
-  public class JsonTextWriter : IDisposable
+  internal class JsonTextWriter : IDisposable
   {
     protected TextWriter _writer;
     protected bool _needsComma = false;

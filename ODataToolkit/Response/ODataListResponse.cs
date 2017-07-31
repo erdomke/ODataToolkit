@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace ODataToolkit
 {
-  internal class ODataListResponse : ODataResponse
+  internal class ODataListResponse : ODataResponseBase
   {
     private IEdmNavigationSource _path;
     private IEnumerable<IEnumerable<KeyValuePair<string, object>>> _records;
