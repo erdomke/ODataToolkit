@@ -42,6 +42,16 @@ namespace ODataToolkit.MsTests
         @"""value"":[{""age"":""7"",""name"":""bob""},{""age"":""10"",""name"":""jane""}],""__count"":5}", json);
     }
 
+    [TestMethod]
+    public void ODataV_AllConvertToJsonResponse()
+    {
+      var resp = GetResponseForVersion(ODataVersion.All, vals);
+      var json = BuildJson(resp);
+
+      Assert.AreEqual(@"{""@odata.context"":""http://localhost/$metadata#entityName"",""@odata.count"":5," +
+        @"""value"":[{""age"":""7"",""name"":""bob""},{""age"":""10"",""name"":""jane""}],""__count"":5}", json);
+    }
+
     private ODataResponse GetResponseForVersion(ODataVersion v, List<Dictionary<string, object>> l)
     {
       var entityType = new EdmEntityType("nsName", "Name");
@@ -53,6 +63,7 @@ namespace ODataToolkit.MsTests
         case ODataVersion.v3:
           uri += "?$inlinecount=allpages"; break;
         case ODataVersion.v4:
+        case ODataVersion.All:
           uri += "?$count=true"; break;
         default: return null;
       }

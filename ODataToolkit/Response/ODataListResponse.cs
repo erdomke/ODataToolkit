@@ -147,7 +147,7 @@ namespace ODataToolkit
           json.WriteValue(_totalCount ?? _records.Count());
         }
 
-        if (_uri.Version.SupportsV2())
+        if (!(_uri.Version.SupportsV4() || _uri.Version.SupportsV3()) && _uri.Version.SupportsV2())
         {
           json.WriteEndObject(); // Close the 'd' object only in v2
         }
