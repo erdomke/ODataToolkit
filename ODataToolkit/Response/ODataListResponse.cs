@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -145,9 +145,13 @@ namespace ODataToolkit
         {
           json.WritePropertyName("__count");
           json.WriteValue(_totalCount ?? _records.Count());
-
-          json.WriteEndObject(); // Close the 'd' object
         }
+
+        if (_uri.Version.SupportsV2())
+        {
+          json.WriteEndObject(); // Close the 'd' object only in v2
+        }
+
         json.WriteEndObject();
       }
     }
