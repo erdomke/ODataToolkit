@@ -16,8 +16,10 @@ var version = string.Format("0.7.{0}.{1}"
 Task("Clean")
   .Does(() =>
 {
-  var buildDir = Directory("./publish/ODataToolkit/lib");
-  CleanDirectory(buildDir);
+  DeleteFiles("./ODataToolkit.*.nupkg");
+  EnsureDirectoryExists("./artifacts");
+  CleanDirectory("./publish/ODataToolkit/lib");
+  CleanDirectory("./artifacts");
 });
 
 Task("Patch-Version")
@@ -66,9 +68,9 @@ Task("NuGet-Pack")
   .IsDependentOn("Build")
   .Does(() =>
 {
-  DeleteFiles("./ODataToolkit.*.nupkg");
   var nuGetPackSettings = new NuGetPackSettings {
-    Version = version
+    Version = version,
+	OutputDirectory = "./artifacts"
   };
   NuGetPack("./publish/ODataToolkit/ODataToolkit.nuspec", nuGetPackSettings);
 });
